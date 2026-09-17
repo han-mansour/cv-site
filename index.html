@@ -131,7 +131,14 @@
   .role-meta{font-family:var(--mono);font-size:11.5px;color:var(--faint);letter-spacing:.03em;margin-bottom:6px}
   .role h3{font-size:19px;letter-spacing:-.01em}
   .role h3 .co{color:var(--muted);font-weight:600}
-  .role .blurb{font-size:13.5px;color:var(--muted);margin-top:6px;max-width:70ch}
+  .role .blurb{
+    display:flex;align-items:flex-start;gap:9px;
+    font-family:var(--mono);font-size:12px;line-height:1.55;color:var(--faint);
+    margin-top:12px;padding:10px 13px;
+    background:var(--surface-2);border-left:2px solid color-mix(in srgb,var(--accent) 45%,transparent);
+    border-radius:0 8px 8px 0;
+  }
+  .role .blurb svg{width:14px;height:14px;flex:none;margin-top:2px;color:var(--accent)}
   .wins{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
   .wins li{font-size:14px;padding-left:17px;position:relative;line-height:1.5;color:var(--ink)}
   .wins li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:2px;background:var(--accent)}
@@ -283,7 +290,7 @@
           <span class="role-tag t-accent">Current role</span>
         </div>
         <div class="role-meta">LONDON · MARCH 2026 &rarr; PRESENT · MAT COVER (FTC)</div>
-        <p class="blurb">Series C fintech intelligence platform for the world's largest banks and SMB operators. Owning lending and credit products with a product-led motion.</p>
+        <p class="blurb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 8h.01M15 8h.01M9 12h.01M15 12h.01M9 16h2"/></svg><span>Series C fintech intelligence platform for the world's largest banks and SMB operators. Owning lending and credit products with a product-led motion.</span></p>
         <ul class="wins">
           <li>Set the <b>product strategy for Credit Intelligence</b> behind a <b>$5M+ lending book</b> (AMEX, SVB, Lloyds+), moving Codat from a reactive, sales-led roadmap to a product-led one through customer discovery and commercial data analysis.</li>
           <li>Shipped several banking data insights capabilities, including validating and de-risking a <b>bank-statement OCR</b>, <b>forecasting $600k+ in incremental ARR</b>, and closing a gap rivals were already winning on.</li>
@@ -298,7 +305,7 @@
           <span class="role-tag t-cool">Promoted 2x</span>
         </div>
         <div class="role-meta">LONDON · APRIL 2021 &rarr; JANUARY 2026</div>
-        <p class="blurb">Series A B2B SaaS tool for content creation in enterprise media (ISO 27001). Built the product function and defined the first gen AI value proposition.</p>
+        <p class="blurb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 8h.01M15 8h.01M9 12h.01M15 12h.01M9 16h2"/></svg><span>Series A B2B SaaS tool for content creation in enterprise media (ISO 27001). Built the product function and defined the first gen AI value proposition.</span></p>
         <ul class="wins">
           <li><b>Drove 22% increase in WAU</b> in strategic accounts (e.g. NYT, AP, Sky) with mobile app expansion and new gen AI assistant.</li>
           <li>Launched a <b>new PLG funnel</b> converting self-serve users into enterprise accounts, delivering <b>$2M+ ARR in Year 1</b>.</li>
@@ -318,7 +325,7 @@
           <span class="role-tag t-gold">&gt;&pound;700k in 6mo</span>
         </div>
         <div class="role-meta">LONDON · MARCH 2020 &rarr; MARCH 2021</div>
-        <p class="blurb">Digital marketplace for discount codes, part of the GoCo group (acquired by Future plc). Drove conversion of SEO traffic, retention and whitelabeling.</p>
+        <p class="blurb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 8h.01M15 8h.01M9 12h.01M15 12h.01M9 16h2"/></svg><span>Digital marketplace for discount codes, part of the GoCo group (acquired by Future plc). Drove conversion of SEO traffic, retention and whitelabeling.</span></p>
         <ul class="wins">
           <li>Led 2 cross-functional squads across MVC marketplace, CMS, and revenue products, aligned to company OKRs.</li>
           <li><b>Launched a successful loyalty programme generating over &pound;700k revenue in 6 months</b> through repeat purchases.</li>
@@ -333,7 +340,7 @@
           <span class="role-tag t-cool">Growth</span>
         </div>
         <div class="role-meta">LONDON · JANUARY 2018 &rarr; FEBRUARY 2021</div>
-        <p class="blurb">Series A proptech startup offering flexible lettings management across Europe and Asia.</p>
+        <p class="blurb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 8h.01M15 8h.01M9 12h.01M15 12h.01M9 16h2"/></svg><span>Series A proptech startup offering flexible lettings management across Europe and Asia.</span></p>
         <ul class="wins">
           <li>Led a cross-functional squad (engineering, QA, design) focused on new customer acquisition and growth into new global markets.</li>
         </ul>
@@ -345,7 +352,7 @@
           <span class="role-tag t-gold">Advisory</span>
         </div>
         <div class="role-meta">REMOTE · PART-TIME · OCTOBER 2020 &rarr; JUNE 2022</div>
-        <p class="blurb">Leading VC accelerators in the MENA region.</p>
+        <p class="blurb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 8h.01M15 8h.01M9 12h.01M15 12h.01M9 16h2"/></svg><span>Leading VC accelerators in the MENA region.</span></p>
         <ul class="wins">
           <li>Advised and coached on product strategy, PMF, team building, and culture during program cohorts and 1:1 mentorship.</li>
         </ul>
