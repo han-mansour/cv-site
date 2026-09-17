@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shaping H2 Lending — Case Study</title>
+<style>:root{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  /* ---------- TOKENS: light is the bare :root ---------- */
+  :root{
+    --bg:#F4F5F7; --surface:#FFFFFF; --surface-2:#EBEEF3; --panel:#FFFFFF;
+    --border:#DCE0E7; --hair:#E4E7ED;
+    --ink:#12161D; --muted:#525C6B; --faint:#828C9B;
+    --accent:#DC4A28; --accent-2:#B23A1E; --accent-soft:#FBE7E0;
+    --cool:#2C767E; --cool-soft:#E0EEEE;
+    --green:#1E8A50; --green-soft:#E3F4EA;
+    --gold:#9C6F1E;
+    --shadow:0 1px 2px rgba(18,22,29,.06),0 8px 24px rgba(18,22,29,.06);
+    --shadow-lift:0 2px 4px rgba(18,22,29,.08),0 18px 44px rgba(18,22,29,.12);
+    --maxw:1120px;
+    --display:'Bricolage Grotesque',system-ui,'Segoe UI',sans-serif;
+    --body:'IBM Plex Sans',system-ui,'Segoe UI',sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0B0E13; --surface:#141922; --surface-2:#1B222D; --panel:#12171F;
+      --border:#28313E; --hair:#20272F;
+      --ink:#EDF1F6; --muted:#98A4B6; --faint:#6A7686;
+      --accent:#FF6A4D; --accent-2:#FF8A72; --accent-soft:#241512;
+      --cool:#5FC7C7; --cool-soft:#12252A;
+      --green:#4FD08A; --green-soft:#122A1D;
+      --gold:#E8B24A;
+      --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 30px rgba(0,0,0,.35);
+      --shadow-lift:0 2px 6px rgba(0,0,0,.6),0 24px 60px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0B0E13; --surface:#141922; --surface-2:#1B222D; --panel:#12171F;
+    --border:#28313E; --hair:#20272F;
+    --ink:#EDF1F6; --muted:#98A4B6; --faint:#6A7686;
+    --accent:#FF6A4D; --accent-2:#FF8A72; --accent-soft:#241512;
+    --cool:#5FC7C7; --cool-soft:#12252A;
+    --green:#4FD08A; --green-soft:#122A1D;
+    --gold:#E8B24A;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 30px rgba(0,0,0,.35);
+    --shadow-lift:0 2px 6px rgba(0,0,0,.6),0 24px 60px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:var(--body);font-size:16px;line-height:1.6;
+    overflow-x:clip;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+  ::selection{background:var(--accent);color:#fff}
+  a{color:inherit}
+
+  .wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:22px}
+  .eyebrow{
+    font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);font-weight:500;display:inline-flex;align-items:center;gap:.6em;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--accent);display:inline-block}
+  .muted{color:var(--muted)}
+  h1,h2,h3{font-family:var(--display);font-weight:800;line-height:1.04;text-wrap:balance;margin:0}
+  p{margin:0}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky;top:env(safe-area-inset-top,0px);z-index:50;
+    background:color-mix(in srgb,var(--bg) 82%,transparent);
+    backdrop-filter:saturate(140%) blur(12px);
+    border-bottom:1px solid var(--hair);
+  }
+  .topbar .row{display:flex;align-items:center;justify-content:space-between;height:54px;gap:18px}
+  .brand{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:-.01em}
+  .brand b{color:var(--accent)}
+  .nav{display:flex;gap:22px;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+  .nav a{color:var(--muted);text-decoration:none;transition:color .15s}
+  .nav a:hover{color:var(--ink)}
+  @media (max-width:760px){.nav{display:none}}
+
+  /* ---------- hero ---------- */
+  .hero{padding-block:76px 40px;position:relative;overflow:hidden}
+  .hero .glow{
+    position:absolute;inset:-30% -10% auto auto;width:60%;height:520px;pointer-events:none;
+    background:radial-gradient(60% 60% at 70% 30%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 70%);
+    filter:blur(20px);opacity:.7;
+  }
+  .hero h1{font-size:clamp(38px,7.2vw,80px);letter-spacing:-.022em;margin-top:20px}
+  .hero h1 .hl{color:var(--accent)}
+  .hero .lead{max-width:60ch;margin-top:22px;font-size:clamp(16px,2.1vw,20px);color:var(--muted)}
+  .hero .lead b{color:var(--ink);font-weight:600}
+  .metaline{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:26px}
+  .chip{
+    font-family:var(--mono);font-size:12px;letter-spacing:.03em;color:var(--muted);
+    border:1px solid var(--border);border-radius:999px;padding:6px 12px;background:var(--surface);
+  }
+  .chip b{color:var(--ink);font-weight:500}
+
+  /* ---------- stat band ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--hair);
+    border:1px solid var(--hair);border-radius:16px;overflow:hidden;margin-top:40px}
+  .stat{background:var(--surface);padding:22px 20px}
+  .stat .n{font-family:var(--display);font-weight:800;font-size:clamp(26px,4.4vw,40px);letter-spacing:-.02em;line-height:1}
+  .stat .n span{color:var(--accent)}
+  .stat .l{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-top:10px}
+  @media (max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+  /* ---------- section frame ---------- */
+  section{padding-block:64px;border-top:1px solid var(--hair)}
+  .sec-head{display:flex;flex-direction:column;gap:16px;max-width:70ch}
+  .sec-head h2{font-size:clamp(26px,4.2vw,42px);letter-spacing:-.018em}
+  .sec-head p{color:var(--muted);font-size:17px}
+  .sec-grid{margin-top:38px}
+
+  /* ---------- TL;DR panel ---------- */
+  .tldr{display:grid;grid-template-columns:1.15fr 1fr;gap:26px;
+    background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:28px;box-shadow:var(--shadow)}
+  .tldr .role{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--cool)}
+  .tldr h3{font-size:24px;margin-top:10px;letter-spacing:-.01em}
+  .tldr p{color:var(--muted);margin-top:12px}
+  .facts{display:flex;flex-direction:column;gap:0;align-self:start;width:100%}
+  .fact{display:grid;grid-template-columns:118px 1fr;gap:14px;padding:11px 0;border-top:1px solid var(--hair);font-size:14.5px}
+  .fact:first-child{border-top:0}
+  .fact dt{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);padding-top:2px}
+  .fact dd{margin:0;color:var(--ink)}
+  @media (max-width:720px){.tldr{grid-template-columns:1fr}}
+
+  /* ---------- starting point / the shift ---------- */
+  .shift{display:grid;grid-template-columns:1fr auto 1fr;gap:22px;align-items:stretch;margin-top:6px}
+  .shift .col{border:1px solid var(--border);border-radius:16px;padding:24px}
+  .shift .from{background:var(--surface)}
+  .shift .to{border-color:color-mix(in srgb,var(--accent) 35%,transparent);background:linear-gradient(180deg,var(--accent-soft),transparent 72%),var(--surface)}
+  .shift .tag{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:16px;font-weight:500}
+  .shift .from .tag{color:var(--faint)}
+  .shift .to .tag{color:var(--accent)}
+  .shift ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:13px}
+  .shift li{font-size:14.5px;padding-left:18px;position:relative;line-height:1.45}
+  .shift .from li{color:var(--muted)}
+  .shift .to li{color:var(--ink)}
+  .shift li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;border-radius:2px}
+  .shift .from li::before{background:var(--faint)}
+  .shift .to li::before{background:var(--accent)}
+  .shift .arrow{display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:26px;color:var(--accent)}
+  @media (max-width:760px){
+    .shift{grid-template-columns:1fr;gap:14px}
+    .shift .arrow{transform:rotate(90deg)}
+  }
+
+  /* ---------- process spine ---------- */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .step{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 18px;position:relative;overflow:hidden}
+  .step .k{font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.05em}
+  .step .num{font-family:var(--display);font-weight:800;font-size:15px;color:var(--accent)}
+  .step h3{font-size:17px;margin-top:12px;letter-spacing:-.01em}
+  .step p{font-size:13.5px;color:var(--muted);margin-top:8px}
+  .step .bar{position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(var(--accent),var(--accent-2))}
+  @media (max-width:900px){.steps{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:520px){.steps{grid-template-columns:1fr}}
+
+  /* ---------- lifecycle track ---------- */
+  .track-wrap{overflow-x:auto;padding-bottom:10px;margin-inline:-22px;padding-inline:22px}
+  .track{display:grid;grid-template-columns:repeat(7,minmax(196px,1fr));gap:0;min-width:1180px;position:relative}
+  .phase-row{display:grid;grid-template-columns:5fr 2fr;gap:12px;margin-bottom:18px}
+  .phase-tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    padding:7px 12px;border-radius:8px;font-weight:500}
+  .phase-orig{background:var(--accent-soft);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+  .phase-ong{background:var(--cool-soft);color:var(--cool);border:1px solid color-mix(in srgb,var(--cool) 30%,transparent)}
+  .stage{border-left:1px solid var(--hair);padding:0 16px 4px}
+  .stage:first-child{border-left:0;padding-left:0}
+  .stage .sn{font-family:var(--display);font-weight:800;font-size:13px;color:var(--faint)}
+  .stage .dot{width:11px;height:11px;border-radius:50%;background:var(--accent);margin:14px 0 14px;position:relative}
+  .stage.ong .dot{background:var(--cool)}
+  .stage .spine{height:1px;background:var(--hair);position:relative;top:-20px;margin-bottom:-1px}
+  .stage h3{font-size:16px;letter-spacing:-.01em;line-height:1.15}
+  .stage .voice{font-family:var(--display);font-weight:600;font-style:normal;color:var(--accent);font-size:13.5px;margin-top:8px}
+  .stage.ong .voice{color:var(--cool)}
+  .stage .who{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+  .stage .who span{font-size:12.5px;color:var(--muted);line-height:1.35}
+  .stage .who b{color:var(--ink);font-weight:600;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;display:block;color:var(--faint)}
+  .track-hint{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-top:6px;letter-spacing:.03em}
+
+  /* ---------- personas ---------- */
+  .personas{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .persona{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
+  .persona .side{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+  .persona.borrower .side{color:var(--cool)}
+  .persona.lender .side{color:var(--accent)}
+  .persona h3{font-size:18px;margin-top:8px;letter-spacing:-.01em}
+  .persona p{font-size:13.5px;color:var(--muted);margin-top:10px}
+  .persona .job{margin-top:14px;font-family:var(--display);font-weight:600;font-size:14px;color:var(--ink);line-height:1.35;
+    border-top:1px solid var(--hair);padding-top:14px}
+  @media (max-width:860px){.personas{grid-template-columns:1fr 1fr}}
+  @media (max-width:560px){.personas{grid-template-columns:1fr}}
+
+  /* ---------- client landscape ---------- */
+  .clients{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .client{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px}
+  .client .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .seg{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:7px;font-weight:500;white-space:nowrap}
+  .seg.bank{background:var(--accent-soft);color:var(--accent)}
+  .seg.fintech{background:var(--cool-soft);color:var(--cool)}
+  .seg.neo{background:color-mix(in srgb,var(--gold) 16%,transparent);color:var(--gold)}
+  .redact{font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.02em;display:inline-flex;align-items:center;gap:7px}
+  .redact .blk{display:inline-block;width:60px;height:11px;border-radius:3px;
+    background:repeating-linear-gradient(45deg,var(--faint),var(--faint) 4px,transparent 4px,transparent 7px);opacity:.5}
+  .client h3{font-size:16.5px;letter-spacing:-.01em;line-height:1.2}
+  .client p{font-size:13px;color:var(--muted)}
+  .client .need{font-size:13px;color:var(--ink);border-top:1px solid var(--hair);padding-top:12px;margin-top:auto}
+  .client .need b{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:4px;font-weight:500}
+  @media (max-width:860px){.clients{grid-template-columns:1fr 1fr}}
+  @media (max-width:560px){.clients{grid-template-columns:1fr}}
+
+  /* ---------- themes ---------- */
+  .themes{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--hair);border:1px solid var(--hair);border-radius:16px;overflow:hidden}
+  .theme{background:var(--surface);padding:22px 22px}
+  .theme .t{display:flex;align-items:baseline;gap:12px}
+  .theme .t .i{font-family:var(--display);font-weight:800;color:var(--accent);font-size:15px}
+  .theme h3{font-size:17px;letter-spacing:-.01em}
+  .theme p{font-size:14px;color:var(--muted);margin-top:8px}
+  @media (max-width:680px){.themes{grid-template-columns:1fr}}
+
+  .quotes{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}
+  .quote{flex:1 1 300px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--cool);
+    border-radius:0 12px 12px 0;padding:18px 20px}
+  .quote p{font-family:var(--display);font-weight:600;font-size:15px;line-height:1.4;letter-spacing:-.005em}
+  .quote .src{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:12px}
+
+  /* ---------- prioritisation matrix ---------- */
+  .matrix-wrap{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:center}
+  .matrix{position:relative;aspect-ratio:1/.82;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;overflow:hidden}
+  .m-grid{position:absolute;inset:44px 16px 40px 52px}
+  .m-grid .cell{position:absolute;border:1px dashed var(--hair)}
+  .axis-y{position:absolute;left:14px;top:44px;bottom:40px;width:1px;background:var(--border)}
+  .axis-x{position:absolute;left:52px;right:16px;bottom:38px;height:1px;background:var(--border)}
+  .m-lab{position:absolute;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
+  .m-lab.top{top:20px;left:52px}
+  .m-lab.bottom{bottom:16px;left:52px}
+  .m-lab.yhi{top:44px;left:0;writing-mode:vertical-rl;transform:rotate(180deg);color:var(--accent)}
+  .m-lab.ylo{bottom:40px;left:0;writing-mode:vertical-rl;transform:rotate(180deg)}
+  .m-lab.xlo{bottom:16px;left:52px}
+  .m-lab.xhi{bottom:16px;right:16px}
+  .plot{position:absolute;transform:translate(-50%,50%);display:flex;align-items:center;gap:7px;white-space:nowrap}
+  .plot .pt{width:12px;height:12px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+  .plot.a .pt{background:var(--accent)}
+  .plot.b .pt{background:var(--cool);box-shadow:0 0 0 4px color-mix(in srgb,var(--cool) 16%,transparent)}
+  .plot.c .pt{background:var(--gold);box-shadow:0 0 0 4px color-mix(in srgb,var(--gold) 16%,transparent)}
+  .plot span{font-size:11.5px;color:var(--ink);font-weight:500;background:color-mix(in srgb,var(--bg) 70%,transparent);padding:1px 5px;border-radius:5px}
+  .matrix-note h3{font-size:20px;letter-spacing:-.01em}
+  .matrix-note p{color:var(--muted);margin-top:12px;font-size:14.5px}
+  .matrix-note ul{margin:16px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+  .matrix-note li{display:flex;gap:11px;font-size:14px;align-items:flex-start}
+  .matrix-note li .d{width:9px;height:9px;border-radius:50%;margin-top:7px;flex:0 0 auto}
+  @media (max-width:820px){.matrix-wrap{grid-template-columns:1fr}.matrix{aspect-ratio:1/.9;max-width:460px}}
+  @media (max-width:460px){
+    .plot span{white-space:normal;max-width:120px;font-size:10.5px;line-height:1.2}
+  }
+  .criteria{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:26px}
+  .crit{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+  .crit .h{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;font-weight:500}
+  .crit.biz .h{color:var(--accent)} .crit.usr .h{color:var(--cool)}
+  .crit p{font-size:13px;color:var(--muted)} .crit b{color:var(--ink);font-weight:600}
+  @media (max-width:640px){.criteria{grid-template-columns:1fr}}
+  .lenses{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .lens .cap{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;line-height:1.5}
+  .lens .cap b{color:var(--ink);font-weight:600}
+  .lens .cap .w1{color:var(--accent)} .lens .cap .w2{color:var(--cool)}
+  @media (max-width:820px){.lenses{grid-template-columns:1fr;gap:30px}}
+  .rose{margin-top:30px;background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px 24px}
+  .rose h3{font-size:20px;letter-spacing:-.01em}
+  .rose p{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:70ch}
+  .rose ul{margin:16px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .rose li{display:flex;gap:10px;font-size:13.5px;align-items:flex-start}
+  .rose li .d{width:9px;height:9px;border-radius:50%;margin-top:6px;flex:0 0 auto}
+  .rose li b{font-weight:600}
+  @media (max-width:820px){.rose ul{grid-template-columns:1fr}}
+
+  /* ---------- opportunity solution tree ---------- */
+  .ost{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:26px 22px;box-shadow:var(--shadow)}
+  .ost .outcome{display:flex;justify-content:center;margin-bottom:8px}
+  .node-outcome{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;
+    border-radius:12px;padding:16px 24px;text-align:center;max-width:560px;box-shadow:var(--shadow-lift)}
+  .node-outcome .k{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+  .node-outcome h3{font-size:20px;margin-top:6px;color:#fff}
+  .ost .stem{width:1px;height:22px;background:var(--border);margin:0 auto}
+  .opps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:4px}
+  .opp{border:1px solid var(--border);border-radius:14px;background:var(--surface);overflow:hidden;display:flex;flex-direction:column}
+  .opp-head{padding:15px 15px 13px;border-bottom:1px solid var(--hair);background:var(--surface-2)}
+  .opp-head .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+  .opp-head h4{font-family:var(--display);font-weight:700;font-size:15.5px;margin:7px 0 0;line-height:1.15;letter-spacing:-.01em}
+  .sols{padding:13px;display:flex;flex-direction:column;gap:8px}
+  .sol{font-size:12.5px;line-height:1.35;padding:9px 11px;border-radius:9px;background:var(--surface-2);color:var(--ink);border:1px solid transparent}
+  .sol.live{border-color:color-mix(in srgb,var(--cool) 45%,transparent);background:var(--cool-soft)}
+  .sol.ext{border-color:color-mix(in srgb,var(--green) 50%,transparent);background:var(--green-soft)}
+  .sol .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--cool);display:block;margin-bottom:3px;font-weight:500}
+  .sol.ext .tag{color:var(--green)}
+  .ost-legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:20px;font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--muted)}
+  .ost-legend span{display:inline-flex;align-items:center;gap:7px}
+  .ost-legend i{width:12px;height:12px;border-radius:4px;display:inline-block}
+  @media (max-width:900px){.opps{grid-template-columns:1fr 1fr}}
+  @media (max-width:520px){.opps{grid-template-columns:1fr}}
+
+  /* ---------- collaboration ---------- */
+  .collab{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .fn{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;position:relative}
+  .fn .role{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .fn h3{font-size:18px;margin-top:6px;letter-spacing:-.01em}
+  .fn p{font-size:13.5px;color:var(--muted);margin-top:11px}
+  .fn ul{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+  .fn li{font-size:13px;color:var(--ink);padding-left:16px;position:relative}
+  .fn li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  .fn.me{background:linear-gradient(180deg,var(--accent-soft),transparent 65%),var(--surface);border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
+  .fn.me li::before{background:var(--accent)}
+  @media (max-width:860px){.collab{grid-template-columns:1fr}.collab .fn.me{order:-1}}
+
+  /* ---------- reflection / close ---------- */
+  .close{display:grid;grid-template-columns:1.1fr .9fr;gap:30px}
+  .close h2{font-size:clamp(24px,3.6vw,36px);letter-spacing:-.018em}
+  .close p{color:var(--muted);margin-top:16px;font-size:16px;max-width:52ch}
+  .next{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px;align-self:start}
+  .next .k{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--cool)}
+  .next ol{margin:14px 0 0;padding-left:0;list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:14px}
+  .next li{counter-increment:n;display:grid;grid-template-columns:26px 1fr;gap:12px;font-size:14px}
+  .next li::before{content:counter(n);font-family:var(--display);font-weight:800;color:var(--accent);font-size:15px}
+  @media (max-width:760px){.close{grid-template-columns:1fr}}
+
+  footer{border-top:1px solid var(--hair);padding-block:34px 40px}
+  .foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;align-items:center}
+  .foot .n{font-family:var(--display);font-weight:700}
+  .foot .m{font-family:var(--mono);font-size:11.5px;color:var(--faint);letter-spacing:.04em;max-width:60ch}
+
+  /* content is visible at rest; a gentle one-time entrance plays only for
+     elements JS marks as below the fold, so nothing is ever stuck hidden */
+  .reveal{opacity:1;transform:none}
+  @media (prefers-reduced-motion:no-preference){
+    html.has-js .reveal.pre{opacity:0;transform:translateY(14px)}
+    html.has-js .reveal{transition:opacity .6s ease,transform .6s ease}
+  }
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+</style>
+
+<div class="topbar">
+  <div class="wrap row">
+    <div class="brand">Hannah Mansour · <b>Lending</b></div>
+    <nav class="nav">
+      <a href="#outcome">Outcome</a>
+      <a href="#process">Process</a>
+      <a href="#lifecycle">Lifecycle</a>
+      <a href="#clients">Clients</a>
+      <a href="#tree">Strategy</a>
+    </nav>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="glow"></div>
+  <div class="wrap">
+    <span class="eyebrow">Product strategy · Codat Lending · H1 → H2 2026</span>
+    <h1>From a room full of questions to a <span class="hl">prioritised H2 lending strategy</span>.</h1>
+    <p class="lead">I brought <b>engineering, implementation and go-to-market</b> into the same room to make sense of how lenders actually work — the workflows, the people, the client data — and turned that into an <b>opportunity solution tree</b> and a shortlist of H2 bets the squads could plan against. This is the shape of that work, kept deliberately high-level.</p>
+    <div class="metaline">
+      <span class="chip"><b>Role:</b> Senior PM, Lending API &amp; Credit Model</span>
+      <span class="chip"><b>Method:</b> Cross-functional discovery + synthesis</span>
+      <span class="chip"><b>Output:</b> H2 strategy &amp; opportunity solution tree</span>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="n">~<span>55</span></div><div class="l">Active lending clients in scope</div></div>
+      <div class="stat"><div class="n">~$<span>5</span>M</div><div class="l">ARR lending book reasoned about</div></div>
+      <div class="stat"><div class="n"><span>3</span></div><div class="l">Functions aligned across the work</div></div>
+      <div class="stat"><div class="n"><span>7</span>→1</div><div class="l">Lifecycle stages → one strategy tree</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- STARTING POINT -->
+<section id="start">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Where this started</span>
+      <h2>A ways-of-working problem, not a feature gap</h2>
+      <p>When I picked up the lending team, the roadmap was whatever the loudest client had asked for in the last sales call. This piece of work was the shift out of that — from reacting deal by deal to a product-led view of where lending could actually grow.</p>
+    </div>
+    <div class="sec-grid shift reveal">
+      <div class="col from">
+        <div class="tag">When I picked it up</div>
+        <ul>
+          <li>Sales-led — the roadmap followed sales conversations, not customer discovery</li>
+          <li>A narrow, feature-level product remit rather than a strategic one</li>
+          <li>Priorities set by the loudest client, one deal at a time</li>
+        </ul>
+      </div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="col to">
+        <div class="tag">Where I moved it</div>
+        <ul>
+          <li>Product-led — grounded in discovery, client data and the whole lifecycle</li>
+          <li>Zoomed out to the broadest lending opportunities, not one client's ask</li>
+          <li>A shared strategy the team owned, so priorities came from evidence, not volume</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTCOME / TLDR -->
+<section id="outcome">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">The outcome first</span>
+      <h2>What the work produced</h2>
+      <p>A shared, evidence-backed view of where Codat should invest to grow adoption of its lending products — expressed as an opportunity solution tree, and narrowed to a handful of H2 bets that engineering and GTM signed up to.</p>
+    </div>
+    <div class="sec-grid">
+      <div class="tldr reveal">
+        <div>
+          <div class="role">The headline</div>
+          <h3>One question — "where's the highest-leverage place to invest in lending?" — answered with the whole picture, not a hunch.</h3>
+          <p>Rather than jump to a feature, I held the team in the problem space: map the lending lifecycle, understand each persona, read the client data, cluster the pain, then let solutions fall out of the opportunities. The tree became the artifact the squads planned H2 against.</p>
+        </div>
+        <dl class="facts">
+          <div class="fact"><dt>My role</dt><dd>Framed the question, facilitated the cross-functional workshop, synthesised, prioritised, owned the strategy.</dd></div>
+          <div class="fact"><dt>Who fed in</dt><dd>Engineering, Implementation / Account Management, GTM &amp; Solutions.</dd></div>
+          <div class="fact"><dt>Evidence base</dt><dd>Client interviews, a ~500-response borrower survey, and product-usage data across the lending book.</dd></div>
+          <div class="fact"><dt>The output</dt><dd>An opportunity solution tree + a prioritised H2 focus across four opportunity areas.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">How I got there</span>
+      <h2>The process I ran</h2>
+      <p>A discovery sequence, not a single meeting. Each step narrowed the space — from "why are we even looking at this?" to a tree the team could act on.</p>
+    </div>
+    <div class="sec-grid steps">
+      <div class="step reveal"><span class="bar"></span><div class="k"><span class="num">01</span> · Frame</div><h3>Frame the opportunity</h3><p>Set the goal (grow adoption of lending products), the metric (billable units / active connected companies), and the real question: where's the highest-leverage place to invest? Problem space before solutions.</p></div>
+      <div class="step reveal"><span class="bar"></span><div class="k"><span class="num">02</span> · Discover</div><h3>Cross-functional discovery</h3><p>Ran a workshop with engineering, implementation and GTM, paired with client interviews and product-usage data — so feasibility, client reality and commercial signal were all in the room.</p></div>
+      <div class="step reveal"><span class="bar"></span><div class="k"><span class="num">03</span> · Map</div><h3>Map the lending lifecycle</h3><p>Laid out the seven stages from pre-qualification to renewal, borrower ↔ lender, so every pain point had a place on the journey.</p></div>
+      <div class="step reveal"><span class="bar"></span><div class="k"><span class="num">04</span> · Personas</div><h3>Personas &amp; job stories</h3><p>Wrote "when… I want… so I can…" job stories for borrower and lender roles, grounding the abstract workflow in real motivations.</p></div>
+      <div class="step reveal"><span class="bar"></span><div class="k"><span class="num">05</span> · Synthesise</div><h3>Cluster the pain</h3><p>Grouped hundreds of pain points and quotes into a handful of themes that recurred across segments — the signal under the noise.</p></div>
+      <div class="step reveal"><span class="bar"></span><div class="k"><span class="num">06</span> · Prioritise</div><h3>Two prioritisation workshops</h3><p>Ran a value/effort pass with engineering and a business-value vs. client-value pass with commercial — two lenses that had to agree before a bet made the shortlist.</p></div>
+      <div class="step reveal"><span class="bar"></span><div class="k"><span class="num">07</span> · Shape</div><h3>Strategy &amp; solution tree</h3><p>Turned the prioritised opportunities into an opportunity solution tree and an H2 focus the squads could plan and delivery against.</p></div>
+      <div class="step reveal" style="background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 30%,transparent)"><span class="bar"></span><div class="k" style="color:var(--accent)"><span class="num">→</span> · Result</div><h3>A plan people owned</h3><p>Because eng and GTM built the tree with me, the H2 focus landed as a shared decision — not a doc handed over a wall.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- LIFECYCLE -->
+<section id="lifecycle">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Shared understanding</span>
+      <h2>The lending lifecycle</h2>
+      <p>The spine everything else hung off. Seven stages, each with the borrower's and lender's job, and the blunt question the borrower is really asking at that moment.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="track-wrap reveal">
+      <div class="track">
+        <div class="stage"><div class="sn">01</div><div class="dot"></div><h3>Lead &amp; Pre-qualification</h3><div class="voice">"Can I even get this?"</div><div class="who"><span><b>Borrower</b>Is it worth applying?</span><span><b>Lender · RM</b>Qualifies the opportunity</span></div></div>
+        <div class="stage"><div class="sn">02</div><div class="dot"></div><h3>Application &amp; Data Collection</h3><div class="voice">"Just send me the docs"</div><div class="who"><span><b>Borrower</b>Gathers &amp; submits</span><span><b>Lender</b>RM chases, analyst triages</span></div></div>
+        <div class="stage"><div class="sn">03</div><div class="dot"></div><h3>Credit Analysis</h3><div class="voice">"Do the numbers hold?"</div><div class="who"><span><b>Borrower</b>Waits, clarifies</span><span><b>Lender</b>Analyst spreads &amp; writes the memo</span></div></div>
+        <div class="stage"><div class="sn">04</div><div class="dot"></div><h3>Decision &amp; Approval</h3><div class="voice">"Yes, no, or change it"</div><div class="who"><span><b>Borrower</b>Receives the outcome</span><span><b>Lender</b>Committee decides, RM communicates</span></div></div>
+        <div class="stage"><div class="sn">05</div><div class="dot"></div><h3>Funding &amp; Onboarding</h3><div class="voice">"Sign, draw, live"</div><div class="who"><span><b>Borrower</b>Signs &amp; draws funds</span><span><b>Lender</b>RM → monitoring handoff</span></div></div>
+        <div class="stage ong"><div class="sn">06</div><div class="dot"></div><h3>Ongoing Monitoring</h3><div class="voice">"Is the book healthy?"</div><div class="who"><span><b>Borrower</b>Runs the business</span><span><b>Lender</b>Monitoring watches for signals</span></div></div>
+        <div class="stage ong"><div class="sn">07</div><div class="dot"></div><h3>Renewal &amp; Annual Review</h3><div class="voice">"What changed?"</div><div class="who"><span><b>Borrower</b>Re-engages</span><span><b>Lender</b>Analyst runs the delta review</span></div></div>
+      </div>
+    </div>
+    <div class="phase-row" style="margin-top:8px">
+      <span class="phase-tag phase-orig">Origination · stages 1–5</span>
+      <span class="phase-tag phase-ong">Ongoing · stages 6–7</span>
+    </div>
+    <p class="track-hint">↔ Scroll the track. Stages 6–7 loop back into a new cycle — the relationship rarely ends at "funded".</p>
+  </div>
+</section>
+
+<!-- PERSONAS -->
+<section id="personas">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Who's in the workflow</span>
+      <h2>The people on both sides</h2>
+      <p>Five roles kept surfacing. Naming them — and what each is really trying to do — stopped us designing for an average user who doesn't exist.</p>
+    </div>
+    <div class="sec-grid personas">
+      <div class="persona lender reveal"><span class="side">Lender</span><h3>Relationship Manager / AE</h3><p>Qualifies the deal, sends the data request (embedded flow or a portal link), and chases what's missing.</p><div class="job">"When a prospect asks 'could you fund X?', I want a directionally-accurate answer in the first meeting."</div></div>
+      <div class="persona lender reveal"><span class="side">Lender</span><h3>Credit Analyst / Underwriter</h3><p>Spreads statements, builds the memo, defends it in committee. Lives or dies by whether the mapped data can be trusted.</p><div class="job">"When I review an application, I want structured, mapped financials — not a zip of PDFs."</div></div>
+      <div class="persona lender reveal"><span class="side">Lender</span><h3>Credit / Risk exec buyer</h3><p>COO, head of lending, credit-risk lead. Cares about ROI, default rates, and the trade-off between speed of underwriting and risk.</p><div class="job">"I want to balance faster decisions against the losses a wrong one creates."</div></div>
+      <div class="persona lender reveal"><span class="side">Lender</span><h3>Lender Product Manager</h3><p>Our main point of contact — wires Codat into each lending product and the underwriting tech stack.</p><div class="job">"I want the data flowing cleanly into the tools my underwriters already use."</div></div>
+      <div class="persona borrower reveal"><span class="side">Borrower</span><h3>SME borrower</h3><p>Running a business, not a finance function. Wants to share data once and get on with the day.</p><div class="job">"When my RM asks for financials, I want to share them once, quickly, and get back to work."</div></div>
+      <div class="persona borrower reveal" style="border-style:dashed;background:transparent"><span class="side" style="color:var(--faint)">The tension</span><h3>Speed vs. trust</h3><p>Borrowers want minimal friction; lenders need audit-defensible, complete, fresh data. Almost every opportunity lives in closing that gap.</p><div class="job" style="color:var(--muted)">The workflow only improves when both sides win at once.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CLIENTS -->
+<section id="clients">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">The client data · names redacted</span>
+      <h2>Who we serve, by segment</h2>
+      <p>The lending book spans global banks to embedded-finance fintechs to neobanks. Names are removed — what matters for strategy is the <em>shape</em> of each segment's need, and how consistently those needs rhymed.</p>
+    </div>
+    <div class="sec-grid clients">
+      <div class="client reveal">
+        <div class="top"><span class="redact"><span class="blk"></span></span><span class="seg bank">Global card network</span></div>
+        <h3>Reactive corporate credit-line increases</h3>
+        <p>Automating collection &amp; spreading of financials for line-increase requests — aiming to cut weeks of manual underwriting to hours.</p>
+        <div class="need"><b>Core need</b>Faster data in, less manual document wrangling, decisions on fresher data.</div>
+      </div>
+      <div class="client reveal">
+        <div class="top"><span class="redact"><span class="blk"></span></span><span class="seg bank">UK high-street bank</span></div>
+        <h3>Invoice finance, FX &amp; commercial card</h3>
+        <p>Multiple lending journeys at different maturities; underwriting runs 2–4 weeks with much of it spent just collecting data.</p>
+        <div class="need"><b>Core need</b>Complete, current data (esp. turnover) without RMs chasing it entity by entity.</div>
+      </div>
+      <div class="client reveal">
+        <div class="top"><span class="redact"><span class="blk"></span></span><span class="seg bank">US commercial &amp; innovation bank</span></div>
+        <h3>Commercial credit underwriting</h3>
+        <p>Extracting balance sheet &amp; P&amp;L into a spreading tool. Only a portion of customers share via Codat; the rest still upload manually.</p>
+        <div class="need"><b>Core need</b>A reliable "are the books closed?" signal and stronger banking-data coverage.</div>
+      </div>
+      <div class="client reveal">
+        <div class="top"><span class="redact"><span class="blk"></span></span><span class="seg fintech">Embedded-finance lender</span></div>
+        <h3>Revenue-based financing</h3>
+        <p>Uses categorised banking data to find a business's true revenue and size the offer — the accuracy of categorisation directly sets the offer.</p>
+        <div class="need"><b>Core need</b>Higher platform-identification accuracy at lower cost, so it scales without a human in the loop.</div>
+      </div>
+      <div class="client reveal">
+        <div class="top"><span class="redact"><span class="blk"></span></span><span class="seg fintech">Vertical SaaS platform lender</span></div>
+        <h3>Merchant cash advance on platform data</h3>
+        <p>Underwrites on its own platform's transaction data alone — blind to the cost side of the business, and can't underwrite young merchants.</p>
+        <div class="need"><b>Core need</b>Cash-flow insight beyond revenue, and earlier underwriting from external data.</div>
+      </div>
+      <div class="client reveal">
+        <div class="top"><span class="redact"><span class="blk"></span></span><span class="seg neo">Emerging fintech lenders &amp; neobanks</span></div>
+        <h3>The Credit Model cohort</h3>
+        <p>Smaller, tech-forward lenders adopting Codat's credit indicators. The clearest demand for proactive, insight-led signals.</p>
+        <div class="need"><b>Core need</b>Ready-made signals — cash-flow patterns, failed payments, capital exposure — surfaced via API.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THEMES -->
+<section id="themes">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">What we heard</span>
+      <h2>Six themes under the noise</h2>
+      <p>Hundreds of stickies and quotes clustered into a handful of problems that showed up at almost every lender, whatever their size.</p>
+    </div>
+    <div class="sec-grid themes reveal">
+      <div class="theme"><div class="t"><span class="i">01</span><h3>Data collection is the bottleneck</h3></div><p>Weeks lost chasing borrowers for piecemeal, wrong-format or incomplete documents — before analysis even starts.</p></div>
+      <div class="theme"><div class="t"><span class="i">02</span><h3>Spreading is slow and manual</h3></div><p>Analysts re-key figures from PDFs. They want structured, mapped financials they can trust, not a folder of files.</p></div>
+      <div class="theme"><div class="t"><span class="i">03</span><h3>Categorisation accuracy caps automation</h3></div><p>Not accurate "enough" for the largest clients to remove the human in the loop — and recategorising is clunky.</p></div>
+      <div class="theme"><div class="t"><span class="i">04</span><h3>Monitoring runs on stale data</h3></div><p>Annual accounts mean a borrower's decline can surface months late — long after a lender could have acted.</p></div>
+      <div class="theme"><div class="t"><span class="i">05</span><h3>Borrowers resist live connections</h3></div><p>Security and privacy fears mean many would rather upload a file than connect a live feed — a coverage gap and an opportunity.</p></div>
+      <div class="theme"><div class="t"><span class="i">06</span><h3>Coverage has hard edges</h3></div><p>Not every platform is integrated. Widening the ways data can come in reaches more borrowers, faster.</p></div>
+    </div>
+    <div class="wrap" style="padding-inline:0">
+    <div class="quotes reveal">
+      <div class="quote"><p>"When a customer sends a bank statement, it's a PDF. We'd want the revenue categorised from that — not only from an API connection."</p><div class="src">— Embedded-finance lender</div></div>
+      <div class="quote"><p>"Many customers will upload PDFs rather than connect. There's real value in matching that to API-grade data quality."</p><div class="src">— Invoice-finance fintech</div></div>
+      <div class="quote"><p>"It could save 25–30% of the time we spend keying figures in by hand."</p><div class="src">— Fintech lender (Credit Model)</div></div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRIORITISATION -->
+<section id="prioritise">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Narrowing down · two workshops</span>
+      <h2>From themes to bets</h2>
+      <p>I didn't prioritise alone. I ran two workshops with different lenses — one with <b style="color:var(--ink);font-weight:600">engineering</b> on feasibility, one with <b style="color:var(--ink);font-weight:600">commercial</b> on value — so the shortlist held up to both "can we build it?" and "will it pay off?".</p>
+    </div>
+
+    <div class="sec-grid reveal">
+      <div class="criteria">
+        <div class="crit biz">
+          <div class="h">How commercial scored business value</div>
+          <p>Does it <b>drive revenue</b> — more connections (usage) or new charges, framed as <b>new vs. existing</b> and <b>win vs. save</b> — <b>and / or</b> is it a <b>strategic foundation</b> for the insights product line?</p>
+        </div>
+        <div class="crit usr">
+          <div class="h">…scored separately from client value</div>
+          <p>Does it <b>solve a real client or end-user need</b> they'll actually adopt? Deliberately kept apart from revenue, so a commercially tempting bet with weak user pull couldn't hide.</p>
+        </div>
+      </div>
+
+      <div class="matrix-wrap">
+        <div class="matrix reveal" role="img" aria-label="Business value versus client value matrix from the commercial prioritisation workshop">
+          <span class="axis-y"></span><span class="axis-x"></span>
+          <span class="m-lab yhi">High business value</span>
+          <span class="m-lab ylo">Low business value</span>
+          <span class="m-lab xlo">Low client value</span>
+          <span class="m-lab xhi">High client value</span>
+          <span class="plot a" style="left:74%;top:20%"><span class="pt"></span><span>Surface risk signals in data</span></span>
+          <span class="plot a" style="left:64%;top:34%"><span class="pt"></span><span>Proactive monitoring</span></span>
+          <span class="plot c" style="left:40%;top:26%"><span class="pt"></span><span>Multi-entity credit analysis</span></span>
+          <span class="plot c" style="left:32%;top:46%"><span class="pt"></span><span>Insights from past decisions</span></span>
+          <span class="plot b" style="left:70%;top:52%"><span class="pt"></span><span>Categorisation accuracy</span></span>
+          <span class="plot b" style="left:60%;top:66%"><span class="pt"></span><span>Widen coverage — uploads</span></span>
+        </div>
+        <div class="matrix-note reveal">
+          <div class="cap" style="font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Commercial workshop · <b style="color:var(--ink);font-weight:600">business value <span style="color:var(--cool)">×</span> client value</b></div>
+          <h3>What rose to the top</h3>
+          <p>The bets in the top-right — high business value and real client pull — were the ones we committed to. Engineering's feasibility read then sequenced them: two "big rocks" scored high but heavy, so they sat behind the quick wins rather than getting dropped.</p>
+          <ul>
+            <li><span class="d" style="background:var(--accent)"></span><span><b>Quick, high-reach wins</b> — intelligent uploads (banking first) and exposing existing credit indicators &amp; risk signals via API.</span></li>
+            <li><span class="d" style="background:var(--cool)"></span><span><b>Strategic foundations</b> — categorisation accuracy underpins every downstream insight, so it earned investment despite the heavier build.</span></li>
+            <li><span class="d" style="background:var(--gold)"></span><span><b>Strategic, with caveats</b> — multi-entity analysis (a route into larger banks) and insights from past decisions: high business value, flagged for legal &amp; data questions first.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OPPORTUNITY SOLUTION TREE -->
+<section id="tree">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">The strategy artifact</span>
+      <h2>The opportunity solution tree</h2>
+      <p>The shape of H2. One outcome at the top, the opportunity areas that serve it, and the solutions under each — with what was already live marked, so the team could see where to build versus where to expose what already existed.</p>
+    </div>
+    <div class="sec-grid ost reveal">
+      <div class="outcome">
+        <div class="node-outcome">
+          <div class="k">Desired outcome</div>
+          <h3>Increase adoption &amp; revenue of lending products</h3>
+        </div>
+      </div>
+      <div class="stem"></div>
+      <div class="opps">
+        <div class="opp">
+          <div class="opp-head"><div class="k">Opportunity 01</div><h4>Accelerate data collection during applications</h4></div>
+          <div class="sols">
+            <div class="sol live"><span class="tag">Extend what's live</span>Intelligent uploads — banking data first for reach</div>
+            <div class="sol">Intelligent uploads for accounting &amp; financial statements</div>
+            <div class="sol">Reduce friction in the linking journey</div>
+            <div class="sol">Data-readiness indicators once a company connects</div>
+            <div class="sol">Widen platform coverage with new integrations</div>
+          </div>
+        </div>
+        <div class="opp">
+          <div class="opp-head"><div class="k">Opportunity 02</div><h4>Improve the financial spreading experience</h4></div>
+          <div class="sols">
+            <div class="sol">Improve chart-of-accounts &amp; bank-transaction categorisation accuracy</div>
+            <div class="sol">Simplify the recategorisation UX in the portal</div>
+            <div class="sol">Learn from client corrections to improve the model</div>
+            <div class="sol">Support multi-entity &amp; consolidated financials</div>
+          </div>
+        </div>
+        <div class="opp">
+          <div class="opp-head"><div class="k">Opportunity 03</div><h4>Accelerate the credit-decisioning process</h4></div>
+          <div class="sols">
+            <div class="sol live"><span class="tag">Expose what exists</span>Make credit indicators available via API</div>
+            <div class="sol ext"><span class="tag">Extend exposed insights</span>Surface richer banking-data signals — related-account &amp; failed-payment detection</div>
+            <div class="sol">Embed the Credit Model into the portal</div>
+            <div class="sol">Surface insights from historical credit decisions</div>
+            <div class="sol">Support richer context (companies house, bureau data)</div>
+          </div>
+        </div>
+        <div class="opp">
+          <div class="opp-head"><div class="k">Opportunity 04</div><h4>Improve the loan-monitoring process</h4></div>
+          <div class="sols">
+            <div class="sol">Detect changes in financial position &amp; alert underwriting</div>
+            <div class="sol live"><span class="tag">In Credit Model today</span>Banking signals: cash-flow, failed payments, capital exposure</div>
+            <div class="sol">Ensure borrowers keep supplying up-to-date data</div>
+            <div class="sol">Customisable alerts on financial-data changes</div>
+          </div>
+        </div>
+      </div>
+      <div class="ost-legend">
+        <span><i style="background:var(--surface-2);border:1px solid var(--border)"></i> New solution to build / test</span>
+        <span><i style="background:var(--cool-soft);border:1px solid color-mix(in srgb,var(--cool) 45%,transparent)"></i> Extend or expose something already live</span>
+        <span><i style="background:var(--green-soft);border:1px solid color-mix(in srgb,var(--green) 50%,transparent)"></i> Extend exposed insights</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COLLABORATION -->
+<section id="collab">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">The collaborative bit</span>
+      <h2>Three functions, one tree</h2>
+      <p>The value wasn't the diagram — it was building it together. Each function brought something the others couldn't, and the tree held all three at once.</p>
+    </div>
+    <div class="sec-grid collab">
+      <div class="fn me reveal">
+        <div class="role">Product · me</div>
+        <h3>Framed &amp; synthesised</h3>
+        <p>Owned the question, ran the room, and turned the mess into a decision.</p>
+        <ul>
+          <li>Set the goal, metric and problem framing up front</li>
+          <li>Facilitated with active exercises, not slides</li>
+          <li>Clustered the pain and prioritised the bets</li>
+          <li>Authored the H2 strategy &amp; the solution tree</li>
+        </ul>
+      </div>
+      <div class="fn reveal">
+        <div class="role">Engineering</div>
+        <h3>Grounded it in feasibility</h3>
+        <p>Kept the tree honest about what could actually ship — and what already existed.</p>
+        <ul>
+          <li>Reality-checked model &amp; upload accuracy limits</li>
+          <li>Flagged constraints (LLM access, data residency, OCR)</li>
+          <li>Pointed out what could be turned on for lending fast</li>
+          <li>T-shirt-sized effort for the value/effort call</li>
+        </ul>
+      </div>
+      <div class="fn reveal">
+        <div class="role">Implementation &amp; GTM</div>
+        <h3>Brought the client reality</h3>
+        <p>Made sure the strategy answered real client asks with commercial weight.</p>
+        <ul>
+          <li>Account managers surfaced live client context &amp; data samples</li>
+          <li>Co-ran a commercial prioritisation workshop scoring business value: new vs. existing, win vs. save, strategic fit</li>
+          <li>Weighted bets by revenue potential and competitive positioning</li>
+          <li>Separated "parity" needs from real differentiation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSE -->
+<section id="close">
+  <div class="wrap close">
+    <div class="reveal">
+      <span class="eyebrow">Reflection</span>
+      <h2>Why this worked</h2>
+      <p>The discipline was staying in the problem space long enough. It's tempting to open with "let's build intelligent uploads" — but the workshop earned a strategy the team believed in, because they watched it come out of the evidence with me.</p>
+      <p>The tree also gave us a shared language: engineering could see where they were exposing existing value versus building new; GTM could see which client asks were served; and I had a prioritised H2 that survived contact with delivery.</p>
+    </div>
+    <div class="next reveal">
+      <div class="k">What I did next</div>
+      <ol>
+        <li>Sequenced the big rock — categorisation accuracy — into a discovery track behind the quick, high-reach wins.</li>
+        <li>Set a banking-data focus for Q3 and accounting-data for Q4: one clean strategy the cross-functional team bought into, and carried it into client roadmap and discovery calls.</li>
+        <li>Shipped two banking-data enhancement features and started a third — bank-statement PDF upload / OCR — before the end of Q3.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div class="n">Hannah Mansour — Senior Product Manager</div>
+    <div class="m">Case study · Codat Lending API &amp; Credit Model. Client names and per-client commercial figures redacted; segments and aggregate metrics shown for illustration.</div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduce||!('IntersectionObserver' in window))return; // everything already visible at rest
+    document.documentElement.classList.add('has-js');
+    var els=[].slice.call(document.querySelectorAll('.reveal'));
+    var vh=window.innerHeight||800;
+    // only pre-hide elements that start below the fold, so the first frame is intact
+    els.forEach(function(e){ if(e.getBoundingClientRect().top > vh*0.9){ e.classList.add('pre'); } });
+    var io=new IntersectionObserver(function(en){
+      en.forEach(function(x){if(x.isIntersecting){x.target.classList.remove('pre');io.unobserve(x.target);}});
+    },{rootMargin:'0px 0px -6% 0px',threshold:.06});
+    els.forEach(function(e){ if(e.classList.contains('pre')) io.observe(e); });
+    // belt-and-braces: never leave anything hidden
+    setTimeout(function(){els.forEach(function(e){e.classList.remove('pre');});},2600);
+  })();
+</script>
+</body>
+</html>
