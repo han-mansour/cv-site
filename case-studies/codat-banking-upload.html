@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Banking Upload Overview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  /* ---------- TOKENS: light is the bare :root ---------- */
+  :root{
+    --bg:#F4F5F7; --surface:#FFFFFF; --surface-2:#EBEEF3; --panel:#FFFFFF;
+    --border:#DCE0E7; --hair:#E4E7ED;
+    --ink:#12161D; --muted:#525C6B; --faint:#828C9B;
+    --accent:#D6337A; --accent-2:#AE1F62; --accent-soft:#FBE1EE;
+    --cool:#2C767E; --cool-soft:#E0EEEE;
+    --green:#1E8A50; --green-soft:#E3F4EA;
+    --amber:#B4791A; --amber-soft:#F8EDD6;
+    --red:#C0392B; --red-soft:#FBE4E1;
+    --gold:#9C6F1E;
+    --shadow:0 1px 2px rgba(18,22,29,.06),0 8px 24px rgba(18,22,29,.06);
+    --shadow-lift:0 2px 4px rgba(18,22,29,.08),0 18px 44px rgba(18,22,29,.12);
+    --maxw:1120px;
+    --display:'Bricolage Grotesque',system-ui,'Segoe UI',sans-serif;
+    --body:'IBM Plex Sans',system-ui,'Segoe UI',sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0B0E13; --surface:#141922; --surface-2:#1B222D; --panel:#12171F;
+      --border:#28313E; --hair:#20272F;
+      --ink:#EDF1F6; --muted:#98A4B6; --faint:#6A7686;
+      --accent:#FF6FA8; --accent-2:#FF97C0; --accent-soft:#2A1220;
+      --cool:#5FC7C7; --cool-soft:#12252A;
+      --green:#4FD08A; --green-soft:#122A1D;
+      --amber:#E8B24A; --amber-soft:#2A2110;
+      --red:#F0715F; --red-soft:#2C1512;
+      --gold:#E8B24A;
+      --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 30px rgba(0,0,0,.35);
+      --shadow-lift:0 2px 6px rgba(0,0,0,.6),0 24px 60px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0B0E13; --surface:#141922; --surface-2:#1B222D; --panel:#12171F;
+    --border:#28313E; --hair:#20272F;
+    --ink:#EDF1F6; --muted:#98A4B6; --faint:#6A7686;
+    --accent:#FF6FA8; --accent-2:#FF97C0; --accent-soft:#2A1220;
+    --cool:#5FC7C7; --cool-soft:#12252A;
+    --green:#4FD08A; --green-soft:#122A1D;
+    --amber:#E8B24A; --amber-soft:#2A2110;
+    --red:#F0715F; --red-soft:#2C1512;
+    --gold:#E8B24A;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 30px rgba(0,0,0,.35);
+    --shadow-lift:0 2px 6px rgba(0,0,0,.6),0 24px 60px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:var(--body);font-size:16px;line-height:1.6;
+    overflow-x:clip;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+  ::selection{background:var(--accent);color:#fff}
+  a{color:inherit}
+
+  .wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:22px}
+  .eyebrow{
+    font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);font-weight:500;display:inline-flex;align-items:center;gap:.6em;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--accent);display:inline-block}
+  .muted{color:var(--muted)}
+  h1,h2,h3{font-family:var(--display);font-weight:800;line-height:1.04;text-wrap:balance;margin:0}
+  p{margin:0}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky;top:env(safe-area-inset-top,0px);z-index:50;
+    background:color-mix(in srgb,var(--bg) 82%,transparent);
+    backdrop-filter:saturate(140%) blur(12px);
+    border-bottom:1px solid var(--hair);
+  }
+  .topbar .row{display:flex;align-items:center;justify-content:space-between;height:54px;gap:18px}
+  .brand{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:-.01em}
+  .brand b{color:var(--accent)}
+  .nav{display:flex;gap:22px;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+  .nav a{color:var(--muted);text-decoration:none;transition:color .15s}
+  .nav a:hover{color:var(--ink)}
+  @media (max-width:820px){.nav{display:none}}
+
+  /* ---------- hero ---------- */
+  .hero{padding-block:76px 40px;position:relative;overflow:hidden}
+  .hero .glow{
+    position:absolute;inset:-30% -10% auto auto;width:60%;height:520px;pointer-events:none;
+    background:radial-gradient(60% 60% at 70% 30%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 70%);
+    filter:blur(20px);opacity:.7;
+  }
+  .hero h1{font-size:clamp(36px,6.6vw,74px);letter-spacing:-.022em;margin-top:20px}
+  .hero h1 .hl{color:var(--accent)}
+  .hero .lead{max-width:62ch;margin-top:22px;font-size:clamp(16px,2.1vw,20px);color:var(--muted)}
+  .hero .lead b{color:var(--ink);font-weight:600}
+  .metaline{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:26px}
+  .chip{
+    font-family:var(--mono);font-size:12px;letter-spacing:.03em;color:var(--muted);
+    border:1px solid var(--border);border-radius:999px;padding:6px 12px;background:var(--surface);
+  }
+  .chip b{color:var(--ink);font-weight:500}
+
+  /* ---------- stat band ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--hair);
+    border:1px solid var(--hair);border-radius:16px;overflow:hidden;margin-top:40px}
+  .stat{background:var(--surface);padding:22px 20px}
+  .stat .n{font-family:var(--display);font-weight:800;font-size:clamp(24px,4vw,38px);letter-spacing:-.02em;line-height:1}
+  .stat .n span{color:var(--accent)}
+  .stat .l{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:10px;line-height:1.4}
+  @media (max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+  /* ---------- section frame ---------- */
+  section{padding-block:64px;border-top:1px solid var(--hair)}
+  .sec-head{display:flex;flex-direction:column;gap:16px;max-width:72ch}
+  .sec-head h2{font-size:clamp(26px,4.2vw,42px);letter-spacing:-.018em}
+  .sec-head p{color:var(--muted);font-size:17px}
+  .sec-grid{margin-top:38px}
+
+  /* ---------- TL;DR panel ---------- */
+  .tldr{display:grid;grid-template-columns:1.15fr 1fr;gap:26px;
+    background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:28px;box-shadow:var(--shadow)}
+  .tldr .role{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--cool)}
+  .tldr h3{font-size:23px;margin-top:10px;letter-spacing:-.01em}
+  .tldr p{color:var(--muted);margin-top:12px}
+  .facts{display:flex;flex-direction:column;gap:0;align-self:start;width:100%}
+  .fact{display:grid;grid-template-columns:120px 1fr;gap:14px;padding:11px 0;border-top:1px solid var(--hair);font-size:14.5px}
+  .fact:first-child{border-top:0}
+  .fact dt{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);padding-top:2px}
+  .fact dd{margin:0;color:var(--ink)}
+  @media (max-width:720px){.tldr{grid-template-columns:1fr}}
+
+  /* ---------- starting point / the shift ---------- */
+  .shift{display:grid;grid-template-columns:1fr auto 1fr;gap:22px;align-items:stretch;margin-top:6px}
+  .shift .col{border:1px solid var(--border);border-radius:16px;padding:24px}
+  .shift .from{background:var(--surface)}
+  .shift .to{border-color:color-mix(in srgb,var(--accent) 35%,transparent);background:linear-gradient(180deg,var(--accent-soft),transparent 72%),var(--surface)}
+  .shift .tag{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:16px;font-weight:500}
+  .shift .from .tag{color:var(--faint)}
+  .shift .to .tag{color:var(--accent)}
+  .shift ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:13px}
+  .shift li{font-size:14.5px;padding-left:18px;position:relative;line-height:1.45}
+  .shift .from li{color:var(--muted)}
+  .shift .to li{color:var(--ink)}
+  .shift li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;border-radius:2px}
+  .shift .from li::before{background:var(--faint)}
+  .shift .to li::before{background:var(--accent)}
+  .shift .arrow{display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:26px;color:var(--accent)}
+  @media (max-width:760px){
+    .shift{grid-template-columns:1fr;gap:14px}
+    .shift .arrow{transform:rotate(90deg)}
+  }
+
+  /* ---------- evidence stat tiles ---------- */
+  .ev{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .ev .tile{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
+  .ev .tile .big{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:-.02em;color:var(--accent);line-height:1}
+  .ev .tile h3{font-size:15px;margin-top:12px;letter-spacing:-.005em}
+  .ev .tile p{font-size:13px;color:var(--muted);margin-top:7px}
+  @media (max-width:760px){.ev{grid-template-columns:1fr}}
+
+  /* ---------- process spine ---------- */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .step{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 18px;position:relative;overflow:hidden}
+  .step .k{font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.05em}
+  .step .num{font-family:var(--display);font-weight:800;font-size:15px;color:var(--accent)}
+  .step h3{font-size:16.5px;margin-top:12px;letter-spacing:-.01em}
+  .step p{font-size:13.5px;color:var(--muted);margin-top:8px}
+  .step .bar{position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(var(--accent),var(--accent-2))}
+  @media (max-width:900px){.steps{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:520px){.steps{grid-template-columns:1fr}}
+
+  /* ---------- personas ---------- */
+  .personas{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .persona{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
+  .persona .side{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+  .persona.borrower .side{color:var(--cool)}
+  .persona.lender .side{color:var(--accent)}
+  .persona h3{font-size:18px;margin-top:8px;letter-spacing:-.01em}
+  .persona p{font-size:13.5px;color:var(--muted);margin-top:10px}
+  .persona .job{margin-top:14px;font-family:var(--display);font-weight:600;font-size:14px;color:var(--ink);line-height:1.35;
+    border-top:1px solid var(--hair);padding-top:14px}
+  @media (max-width:860px){.personas{grid-template-columns:1fr}}
+
+  /* ---------- prototypes / device frames ---------- */
+  .protos{display:flex;flex-direction:column;gap:32px}
+  .proto.b .screen{max-width:520px}
+  .proto .cap{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .proto .cap .t{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;font-weight:500}
+  .proto.b .cap .t{color:var(--cool)} .proto.l .cap .t{color:var(--accent)}
+  .proto .cap h3{font-size:18px;letter-spacing:-.01em}
+  .proto .cap p{font-size:13px;color:var(--muted);flex-basis:100%}
+
+  /* A self-contained light "product screen" that holds in either theme */
+  .screen{
+    --s-bg:#F7F8FA; --s-surface:#FFFFFF; --s-ink:#1B2430; --s-muted:#5A6675;
+    --s-faint:#8A94A3; --s-border:#E4E8EE; --s-accent:#DC4A28;
+    --s-green:#1E8A50; --s-green-bg:#E7F5EC; --s-amber:#B4791A; --s-amber-bg:#FBF0D8;
+    background:var(--s-bg);border:1px solid var(--border);border-radius:14px;overflow:hidden;
+    box-shadow:var(--shadow);font-family:var(--body);color:var(--s-ink)
+  }
+  .chrome{display:flex;align-items:center;gap:6px;padding:9px 12px;background:var(--s-surface);border-bottom:1px solid var(--s-border)}
+  .chrome .dot{width:9px;height:9px;border-radius:50%;background:#E2E5EA}
+  .chrome .url{margin-left:8px;font-family:var(--mono);font-size:10.5px;color:var(--s-faint);
+    background:var(--s-bg);border:1px solid var(--s-border);border-radius:6px;padding:3px 9px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .s-body{padding:18px 16px}
+  .s-h{font-family:var(--display);font-weight:800;font-size:16px;color:var(--s-ink);display:flex;align-items:center;gap:8px}
+  .s-badge{font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;font-weight:500;
+    color:var(--s-accent);background:#FBE7E0;border-radius:5px;padding:2px 6px}
+  .s-sub{font-size:11.5px;color:var(--s-muted);margin-top:5px;line-height:1.45}
+  .s-card{background:var(--s-surface);border:1px solid var(--s-border);border-radius:10px;padding:13px 14px;margin-top:12px}
+  .s-card .ic{width:26px;height:26px;border-radius:7px;background:var(--s-bg);border:1px solid var(--s-border);display:flex;align-items:center;justify-content:center;font-size:13px}
+  .s-row{display:flex;align-items:center;gap:10px}
+  .s-card h4{font-family:var(--display);font-weight:700;font-size:13px;margin:0;color:var(--s-ink)}
+  .s-card .d{font-size:11px;color:var(--s-muted);margin-top:7px}
+  .s-btn{margin-top:11px;display:inline-block;font-family:var(--body);font-weight:600;font-size:11.5px;
+    color:var(--s-ink);background:var(--s-surface);border:1px solid var(--s-border);border-radius:7px;padding:6px 12px}
+  .s-btn.p{background:var(--s-accent);color:#fff;border-color:var(--s-accent)}
+  .s-drop{margin-top:12px;border:1.5px dashed #C8D0DA;border-radius:10px;background:var(--s-surface);
+    padding:20px 12px;text-align:center}
+  .s-drop .di{font-size:20px}
+  .s-drop .dt{font-size:12px;margin-top:6px;color:var(--s-ink);font-weight:600}
+  .s-drop .dt b{color:var(--s-accent)}
+  .s-drop .dm{font-family:var(--mono);font-size:9.5px;color:var(--s-faint);margin-top:5px}
+  .s-tbl{margin-top:12px;border:1px solid var(--s-border);border-radius:10px;overflow:hidden;background:var(--s-surface)}
+  .s-tbl .th,.s-tbl .tr{display:grid;grid-template-columns:1fr 52px 60px;gap:8px;align-items:center;padding:9px 12px}
+  .s-tbl .th{background:var(--s-bg);font-family:var(--mono);font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--s-faint)}
+  .s-tbl .tr{border-top:1px solid var(--s-border)}
+  .s-tbl .fn{font-size:11px;font-weight:600;color:var(--s-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .s-tbl .fn small{display:block;font-weight:400;font-family:var(--mono);font-size:9px;color:var(--s-faint);margin-top:2px}
+  .s-tbl .num{font-family:var(--mono);font-size:11px;color:var(--s-muted);text-align:right}
+  .s-pill{font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 7px;border-radius:20px;text-align:center;justify-self:start}
+  .s-pill.ok{color:var(--s-green);background:var(--s-green-bg)}
+  .s-pill.rev{color:var(--s-amber);background:var(--s-amber-bg)}
+  .s-note{font-family:var(--mono);font-size:9.5px;color:var(--s-faint);margin-top:10px;display:flex;align-items:center;gap:6px}
+  /* portal (lender) — full company-page screen */
+  .screen.portal{--s-red:#C0392B;--s-red-bg:#FBE4E1}
+  .p-top{display:flex;align-items:center;gap:16px;padding:10px 16px;background:var(--s-surface);border-bottom:1px solid var(--s-border)}
+  .p-logo{font-family:var(--display);font-weight:800;font-size:14px;color:var(--s-accent)}
+  .p-tabs{display:flex;gap:16px;font-size:11px;color:var(--s-muted)}
+  .p-tabs .on{color:var(--s-ink);font-weight:600}
+  .p-search{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--s-faint);background:var(--s-bg);border:1px solid var(--s-border);border-radius:6px;padding:5px 12px;min-width:150px}
+  .p-main{display:grid;grid-template-columns:184px 1fr}
+  .p-rail{background:var(--s-surface);border-right:1px solid var(--s-border);padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+  .p-co{font-family:var(--display);font-weight:700;font-size:13px;color:var(--s-ink);margin-bottom:10px}
+  .p-rail a{font-size:11px;color:var(--s-muted);text-decoration:none;padding:5px 8px;border-radius:6px;display:flex;align-items:center;gap:6px}
+  .p-rail a.on{background:#FBEEEA;color:var(--s-accent);font-weight:600}
+  .p-grp{font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--s-faint);margin:10px 0 3px;padding-left:8px}
+  .p-new{font-family:var(--mono);font-size:8px;letter-spacing:.04em;text-transform:uppercase;color:var(--s-accent);background:#FBE7E0;border-radius:4px;padding:1px 5px}
+  .p-content{padding:20px 22px;min-width:0}
+  .p-uphead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:20px;margin-bottom:9px}
+  .p-uphead .ut{font-family:var(--display);font-weight:700;font-size:13px;color:var(--s-ink)}
+  .p-uphead .uc{font-family:var(--mono);font-size:10px;color:var(--s-faint)}
+  .p-tblwrap{overflow-x:auto;border-radius:10px;border:1px solid var(--s-border)}
+  .p-tbl{min-width:560px;background:var(--s-surface)}
+  .p-th,.p-tr{display:grid;grid-template-columns:2.5fr 66px 92px 92px 96px;gap:10px;align-items:center;padding:10px 14px}
+  .p-th{background:var(--s-bg);font-family:var(--mono);font-size:9px;letter-spacing:.04em;text-transform:uppercase;color:var(--s-faint)}
+  .p-tr{border-top:1px solid var(--s-border);font-size:11px}
+  .p-fn{font-weight:600;color:var(--s-ink);display:flex;gap:8px;align-items:flex-start;white-space:nowrap;overflow:hidden}
+  .p-fn .fi{flex-shrink:0}
+  .p-fn small{display:block;font-weight:400;font-family:var(--mono);font-size:8.5px;color:var(--s-faint);margin-top:2px}
+  .p-num{font-family:var(--mono);color:var(--s-muted)}
+  .p-rec{font-family:var(--mono);font-size:9px;font-weight:500;padding:3px 10px;border-radius:20px;justify-self:start;display:inline-flex;align-items:center;gap:5px}
+  .p-rec::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .p-rec.yes{color:var(--s-green);background:var(--s-green-bg)}
+  .p-rec.no{color:var(--s-red);background:var(--s-red-bg)}
+  .p-act{font-size:10.5px;font-weight:600;color:var(--s-accent);justify-self:start}
+  .p-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;font-family:var(--mono);font-size:9.5px;color:var(--s-faint)}
+  @media (max-width:640px){.p-main{grid-template-columns:1fr}.p-rail{display:none}}
+
+  /* ---------- pipeline ---------- */
+  .pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:0;align-items:stretch;
+    border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--surface)}
+  .pnode{padding:22px 18px;border-left:1px solid var(--hair);position:relative}
+  .pnode:first-child{border-left:0}
+  .pnode .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+  .pnode h3{font-size:16px;margin-top:9px;letter-spacing:-.01em}
+  .pnode p{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .pnode .tech{font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:10px;letter-spacing:.02em}
+  @media (max-width:820px){.pipe{grid-template-columns:1fr 1fr}.pnode:nth-child(3){border-left:0}}
+  @media (max-width:480px){.pipe{grid-template-columns:1fr}.pnode{border-left:0;border-top:1px solid var(--hair)}.pnode:first-child{border-top:0}}
+
+  .decisions{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--hair);border:1px solid var(--hair);border-radius:16px;overflow:hidden;margin-top:18px}
+  .dec{background:var(--surface);padding:18px 20px}
+  .dec h4{font-family:var(--display);font-weight:700;font-size:14.5px;letter-spacing:-.005em;display:flex;gap:9px;align-items:baseline}
+  .dec h4 .i{color:var(--accent);font-size:12px}
+  .dec p{font-size:13px;color:var(--muted);margin-top:7px}
+  @media (max-width:680px){.decisions{grid-template-columns:1fr}}
+
+  /* ---------- commercial / table ---------- */
+  .comm{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start;margin-bottom:26px}
+  .comm .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px 24px}
+  .comm .card .k{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--cool);margin-bottom:10px}
+  .comm .card h3{font-size:19px;letter-spacing:-.01em}
+  .comm .card p{font-size:14px;color:var(--muted);margin-top:10px}
+  .comm .card .price{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+  .comm .card .price div{display:grid;grid-template-columns:96px 1fr;gap:12px;font-size:13.5px;align-items:baseline}
+  .comm .card .price b{font-family:var(--mono);font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:var(--accent);font-weight:500}
+  @media (max-width:760px){.comm{grid-template-columns:1fr}}
+
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:16px;background:var(--surface)}
+  table.rev{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px}
+  table.rev th,table.rev td{text-align:left;padding:13px 16px;border-top:1px solid var(--hair)}
+  table.rev thead th{border-top:0;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);font-weight:500;background:var(--surface-2)}
+  table.rev td.n{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+  table.rev tbody tr:hover{background:color-mix(in srgb,var(--accent) 5%,transparent)}
+  table.rev tfoot td{border-top:2px solid var(--border);font-weight:600}
+  table.rev tfoot td.n{color:var(--accent);font-family:var(--mono)}
+  .conf{font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:20px;font-weight:500;white-space:nowrap}
+  .conf.h{color:var(--green);background:var(--green-soft)}
+  .conf.m{color:var(--amber);background:var(--amber-soft)}
+  .conf.l{color:var(--faint);background:var(--surface-2)}
+  .seg{font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;color:var(--faint)}
+  .seg .blk{display:inline-block;width:38px;height:9px;border-radius:3px;vertical-align:middle;margin-right:7px;
+    background:repeating-linear-gradient(45deg,var(--faint),var(--faint) 4px,transparent 4px,transparent 7px);opacity:.45}
+
+  /* ---------- risk grid ---------- */
+  .risks{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .risk{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;position:relative;overflow:hidden}
+  .risk .rb{position:absolute;left:0;top:0;bottom:0;width:4px}
+  .risk.low .rb{background:var(--green)} .risk.med .rb{background:var(--amber)}
+  .risk .lvl{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+  .risk.low .lvl{color:var(--green)} .risk.med .lvl{color:var(--amber)}
+  .risk .lvl .d{width:8px;height:8px;border-radius:50%;background:currentColor}
+  .risk h3{font-size:15px;margin-top:10px;letter-spacing:-.005em}
+  .risk p{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .risk .rz{font-size:12px;color:var(--ink);margin-top:10px;border-top:1px solid var(--hair);padding-top:10px}
+  .risk .rz b{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:3px;font-weight:500}
+  @media (max-width:900px){.risks{grid-template-columns:1fr 1fr}}
+  @media (max-width:520px){.risks{grid-template-columns:1fr}}
+
+  /* ---------- confidence table ---------- */
+  .conf-tbl{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--surface);margin-top:18px}
+  .conf-tbl .cr{display:grid;grid-template-columns:120px 1fr 1.3fr;gap:14px;padding:12px 18px;border-top:1px solid var(--hair);font-size:13.5px;align-items:center}
+  .conf-tbl .cr:first-child{border-top:0;background:var(--surface-2);font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
+  .conf-tbl .band{font-family:var(--mono);font-weight:500}
+  .conf-tbl .cr.i1 .band{color:var(--green)} .conf-tbl .cr.i2 .band{color:var(--amber)}
+  .conf-tbl .cr.i3 .band{color:var(--accent)} .conf-tbl .cr.i4 .band{color:var(--red)}
+  .conf-tbl .act{color:var(--muted)}
+  @media (max-width:620px){.conf-tbl .cr{grid-template-columns:1fr;gap:4px}.conf-tbl .cr:first-child{display:none}}
+
+  /* ---------- build / outcome ---------- */
+  .build{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .bcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
+  .bcard .tk{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--accent);font-weight:500}
+  .bcard h3{font-size:15.5px;margin-top:9px;letter-spacing:-.005em}
+  .bcard p{font-size:13px;color:var(--muted);margin-top:8px}
+  @media (max-width:820px){.build{grid-template-columns:1fr}}
+
+  .quotes{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}
+  .quote{flex:1 1 300px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--cool);
+    border-radius:0 12px 12px 0;padding:18px 20px}
+  .quote p{font-family:var(--display);font-weight:600;font-size:15px;line-height:1.4;letter-spacing:-.005em}
+  .quote .src{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:12px}
+
+  /* ---------- reflection / close ---------- */
+  .close{display:grid;grid-template-columns:1.1fr .9fr;gap:30px}
+  .close h2{font-size:clamp(24px,3.6vw,36px);letter-spacing:-.018em}
+  .close p{color:var(--muted);margin-top:16px;font-size:16px;max-width:54ch}
+  .next{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px;align-self:start}
+  .next .k{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--cool)}
+  .next ol{margin:14px 0 0;padding-left:0;list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:14px}
+  .next li{counter-increment:n;display:grid;grid-template-columns:26px 1fr;gap:12px;font-size:14px}
+  .next li::before{content:counter(n);font-family:var(--display);font-weight:800;color:var(--accent);font-size:15px}
+  @media (max-width:760px){.close{grid-template-columns:1fr}}
+
+  .callout{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 14px 14px 0;padding:20px 24px;margin-top:26px}
+  .callout .k{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:500}
+  .callout p{margin-top:9px;font-size:15px;color:var(--ink);line-height:1.55}
+
+  footer{border-top:1px solid var(--hair);padding-block:34px 40px}
+  .foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;align-items:center}
+  .foot .n{font-family:var(--display);font-weight:700}
+  .foot .m{font-family:var(--mono);font-size:11.5px;color:var(--faint);letter-spacing:.04em;max-width:64ch}
+
+  .reveal{opacity:1;transform:none}
+  @media (prefers-reduced-motion:no-preference){
+    html.has-js .reveal.pre{opacity:0;transform:translateY(14px)}
+    html.has-js .reveal{transition:opacity .6s ease,transform .6s ease}
+  }
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="wrap row">
+    <div class="brand">Hannah Mansour · <b>Banking Data</b></div>
+    <nav class="nav">
+      <a href="#outcome">Outcome</a>
+      <a href="#process">Process</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#prototypes">Prototypes</a>
+      <a href="#commercial">Commercial</a>
+      <a href="#build">Build</a>
+    </nav>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="glow"></div>
+  <div class="wrap">
+    <span class="eyebrow">Product discovery → build · Codat Lending · Intelligent Upload for Banking · 2026</span>
+    <h1>Making a bank-statement <span class="hl">PDF as good as a live connection</span>.</h1>
+    <p class="lead">Half of small businesses would rather send a lender a <b>PDF</b> than link their bank account. I led the discovery, ran the technical feasibility benchmark, modelled the commercial case and prototyped the journeys to turn <b>"can we read a bank statement well enough to underwrite on it?"</b> into a de-risked, US-first MVP now moving into engineering.</p>
+    <div class="metaline">
+      <span class="chip"><b>Role:</b> Senior PM, Lending API &amp; Credit Model</span>
+      <span class="chip"><b>Method:</b> Discovery · feasibility benchmark · commercial modelling · UX prototyping</span>
+      <span class="chip"><b>Output:</b> Evidence-based recommendation, scoped to build</span>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="n">~<span>50</span>%</div><div class="l">of SMBs prefer to share data by file, not a live link</div></div>
+      <div class="stat"><div class="n"><span>71</span></div><div class="l">bank statements benchmarked, 30+ banks, 10,717 transactions</div></div>
+      <div class="stat"><div class="n">$<span>310</span>k</div><div class="l">modelled year-one ARR from the lead design partner alone</div></div>
+      <div class="stat"><div class="n"><span>4</span>→1</div><div class="l">big product risks assessed, feasibility retired by test</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- CHALLENGE -->
+<section id="challenge">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">The challenge</span>
+      <h2>Codat could only serve the businesses willing to connect a live feed</h2>
+      <p>Codat's lending products turn a business's connected accounting and banking data into structured, categorised financials a lender can underwrite on. The problem: a large share of borrowers never connect at all — and the ones who won't are invisible to the entire product line.</p>
+    </div>
+    <div class="sec-grid shift reveal">
+      <div class="col from">
+        <div class="tag">The problem we kept hitting</div>
+        <ul>
+          <li>~60% of SMBs still share financials by PDF, email or post rather than linking their accounts</li>
+          <li>Even when linking is offered, only 20–40% of borrowers connect a bank account, depending on the partner</li>
+          <li>In the US, many banks return only 6 months of data via Plaid — too little for many underwriting decisions</li>
+          <li>Lenders bridge the gap with manual review plus a separate OCR tool — fragmented, slow, error-prone</li>
+        </ul>
+      </div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="col to">
+        <div class="tag">The opportunity</div>
+        <ul>
+          <li>Let an SMB upload a bank-statement PDF during the same Link journey they'd use to connect</li>
+          <li>Run it through Codat's existing pipeline so uploaded data is standardised, categorised and enriched like connected data</li>
+          <li>Reach the ~50% of businesses who won't link — one workflow for the lender, no second OCR vendor to build to</li>
+          <li>Extend a capability Codat already shipped for accounting data into banking, where the demand was loudest</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout reveal">
+      <div class="k">Why it mattered commercially</div>
+      <p>We were already losing prospects over it: several walked because Codat couldn't ingest an uploaded statement, while Heron, Ocrolus, Perfios and Docsumo already could. As much about defending the roadmap as expanding it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- OUTCOME / TLDR -->
+<section id="outcome">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">The outcome first</span>
+      <h2>A contested idea, turned into a scoped, evidence-backed bet</h2>
+      <p>The initiative was ambiguous and its ROI was openly challenged — it swung from green to red and back as the team pressure-tested scope and value. The discovery and feasibility work is what settled it: a clear, defensible recommendation to build a US-first MVP, currently in development for testing partners in early Q4.</p>
+    </div>
+    <div class="sec-grid">
+      <div class="tldr reveal">
+        <div>
+          <div class="role">The headline</div>
+          <h3>"Can we read a bank statement well enough to underwrite on it?" — answered with a 71-statement benchmark, not an assumption.</h3>
+          <p>Rather than take extraction accuracy on faith, I ran the OCR model against real statements across 30+ banks, proved it worked for US data, found and diagnosed the failure modes, and used that evidence to scope a realistic MVP. The commercial model and two prototyped journeys made the case concrete enough to fund.</p>
+        </div>
+        <dl class="facts">
+          <div class="fact"><dt>My role</dt><dd>Owned the opportunity end to end: framing, feasibility benchmark, UX prototypes, commercial model, and scoping into engineering.</dd></div>
+          <div class="fact"><dt>Who fed in</dt><dd>Data Platform &amp; engineering, GTM / Solutions, the Spend Insights team (existing upload flow), and design partners.</dd></div>
+          <div class="fact"><dt>Evidence base</dt><dd>71 statements benchmarked, an April 2026 borrower survey, a competitor scan, and design-partner interviews.</dd></div>
+          <div class="fact"><dt>The output</dt><dd>US-first recommendation, a two-step technical architecture, a confidence-rated ROI model, and a scoped build.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">How I got there</span>
+      <h2>The process I ran</h2>
+      <p>A discovery sequence built to attack the riskiest unknowns first. Feasibility was the one that could kill the whole idea, so that's where I went early — before design or a business case had anything to stand on.</p>
+    </div>
+    <div class="sec-grid steps">
+      <div class="step reveal"><span class="bar"></span><div class="k"><span class="num">01</span> · Frame</div><h3>Frame the bet &amp; the hypothesis</h3><p>If we extract banking data from uploaded statements, lenders can support more SMB applications — because most borrowers prefer to share documents. Success = more connections per client.</p></div>
+      <div class="step reveal"><span class="bar"></span><div class="k"><span class="num">02</span> · Demand</div><h3>Size the demand</h3><p>Borrower survey, competitor scan, a map of client interest and lost deals, and an ROI analysis I built with commercial — establishing this was a real, recurring need with a quantified opportunity, not one loud client.</p></div>
+      <div class="step reveal"><span class="bar"></span><div class="k"><span class="num">03</span> · Feasibility</div><h3>Benchmark the OCR</h3><p>The make-or-break question. I tested the extraction model against 71 real statements to find out whether the data was actually good enough to underwrite on.</p></div>
+      <div class="step reveal"><span class="bar"></span><div class="k"><span class="num">04</span> · Prove</div><h3>Proof of concept</h3><p>Turned the benchmark into a working PoC and a set of architecture decisions — how extraction, mapping and reconciliation should actually be built.</p></div>
+      <div class="step reveal"><span class="bar"></span><div class="k"><span class="num">05</span> · Design</div><h3>Prototype both journeys</h3><p>Prototyped the borrower upload (in Link) and the lender review (in the Portal), grounded in the PoC's real behaviour and edge cases.</p></div>
+      <div class="step reveal"><span class="bar"></span><div class="k"><span class="num">06</span> · Model</div><h3>Build the commercial case</h3><p>With GTM, a confidence-rated revenue model by client and a running-cost model — the numbers that moved the idea back out of red.</p></div>
+      <div class="step reveal"><span class="bar"></span><div class="k"><span class="num">07</span> · Scope</div><h3>Recommend &amp; scope</h3><p>A US-first recommendation with the UK deferred, cut into an MVP scope and engineering stories the squad could plan against.</p></div>
+      <div class="step reveal" style="background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 30%,transparent)"><span class="bar"></span><div class="k" style="color:var(--accent)"><span class="num">→</span> · Result</div><h3>Into build</h3><p>Feasibility retired, scope defined, first engineering stories created — the bet moved from idea to delivery.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- EVIDENCE / OCR BENCHMARK -->
+<section id="evidence">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">The make-or-break test · my own benchmark</span>
+      <h2>I benchmarked the OCR before we committed a line of code</h2>
+      <p>Extraction accuracy was the single biggest unknown — and the fastest way to waste a quarter. So I ran Azure Document Intelligence's <span style="font-family:var(--mono);font-size:13px">prebuilt-bankStatement.us</span> model against a real sample and measured what it could and couldn't do, grounded in Codat's own <span style="font-family:var(--mono);font-size:13px">Banking: Transaction</span> data model.</p>
+    </div>
+
+    <div class="sec-grid ev reveal">
+      <div class="tile"><div class="big">71</div><h3>statements, 30+ banks</h3><p>51 US and 20 UK statements spanning 2022–2026, deliberately skewed toward the SMB segments our lenders actually see.</p></div>
+      <div class="tile"><div class="big">10,717</div><h3>transactions scored</h3><p>Measured field coverage, amount-parse consistency, row-level confidence and the statement metadata a live feed can't give you.</p></div>
+      <div class="tile"><div class="big">~0</div><h3>amount errors on US banks</h3><p>Date and description coverage was high across the majority of US banks; the only material amount errors sat in one non-representative outlier layout.</p></div>
+    </div>
+
+    <div class="sec-grid reveal" style="margin-top:22px">
+      <div class="tldr" style="grid-template-columns:1fr">
+        <div>
+          <div class="role" style="color:var(--accent)">The verdict</div>
+          <h3>US works. UK needs a different model.</h3>
+          <p style="max-width:76ch">The headline was clean: <b style="color:var(--ink);font-weight:600">pursue US statement processing; don't extend to the UK without a UK-tuned model.</b> Extraction was strong across US banks, and the handful of apparent failures turned out to have understood root causes and simple post-processing fixes rather than model dead ends. The full analysis sits in the evaluation.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-grid reveal" style="margin-top:22px">
+      <a href="https://claude.ai/artifact/MEqexQAk8W3fW7BE8oN2RY" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;letter-spacing:.03em;text-decoration:none;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:10px;padding:13px 20px;background:var(--accent-soft)">📊 Read the full 71-statement evaluation <span aria-hidden="true">→</span></a>
+    </div>
+
+    <p class="muted reveal" style="font-size:13.5px;margin-top:14px">The benchmark also set the ingestion thresholds the MVP uses to decide what's safe to ingest, what to flag, and what to reject — the full table is in the evaluation.</p>
+  </div>
+</section>
+
+<!-- PROTOTYPES -->
+<section id="prototypes">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Designing the two sides</span>
+      <h2>Two journeys: the borrower uploads, the lender reviews</h2>
+      <p>The feature only works if both sides win — the borrower shares once and gets on with their day, and the lender gets structured, trustworthy data with the low-confidence rows flagged rather than a folder of PDFs. I prototyped both to pressure-test the flow against the PoC's real edge cases. The screens below reproduce those working prototypes.</p>
+    </div>
+
+    <div class="sec-grid protos reveal">
+      <!-- Borrower / Link -->
+      <div class="proto b">
+        <div class="cap">
+          <span class="t">Borrower · in Link</span>
+          <h3>Share your financial information</h3>
+          <p>The SMB is offered the same choices as a live connection — connect accounting, connect banking, or simply upload the documents they already have to hand.</p>
+        </div>
+        <div class="screen" role="img" aria-label="Reproduction of the borrower-facing Link upload prototype: a 'Share your financial information' screen with options to connect accounting, connect banking, or upload business documents.">
+          <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">link.codat.io / share</span></div>
+          <div class="s-body">
+            <div class="s-h">Share your financial information</div>
+            <div class="s-sub">You'll be asked to sign in to your accounts to authorise sharing your financial information.</div>
+            <div class="s-card">
+              <div class="s-row"><span class="ic">📊</span><h4>Accounting</h4></div>
+              <div class="d">Connect your accounting software.</div>
+              <span class="s-btn">Connect</span>
+            </div>
+            <div class="s-card">
+              <div class="s-row"><span class="ic">🏦</span><h4>Banking</h4></div>
+              <div class="d">Connect your bank account.</div>
+              <span class="s-btn">Connect</span>
+            </div>
+            <div class="s-card" style="border-color:#F2C9BB;background:#FFFBFA">
+              <div class="s-row"><span class="ic">📄</span><h4>Business documents</h4></div>
+              <div class="d">Upload bank-statement PDFs — we'll extract and categorise them.</div>
+              <span class="s-btn p">Upload files</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lender / Portal -->
+      <div class="proto l">
+        <div class="cap">
+          <span class="t">Lender · in the Portal</span>
+          <h3>Upload &amp; review bank statements</h3>
+          <p>The lender drops in statements — including multi-account and multi-file uploads — and gets a per-statement view. Each statement is reconciled at statement level (opening and closing balances checked against the extracted transactions); a reconciled statement is ready to <b style="color:var(--ink);font-weight:600">view bank data</b>, while one that doesn't reconcile is flagged to <b style="color:var(--ink);font-weight:600">review PDF</b>.</p>
+        </div>
+        <div class="screen portal" role="img" aria-label="Reproduction of the lender-facing Codat Portal prototype: an 'Upload bank statements' company page with a drag-and-drop zone and a table of uploaded statements showing pages, a reconciled Yes/No status, transaction counts, and per-statement actions.">
+          <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">app.codat.io / companies / POCnation-Ltd / upload-bank-statements</span></div>
+          <div class="p-top">
+            <div class="p-logo">Codat</div>
+            <div class="p-tabs"><span>Home</span><span>Spend Insights</span><span class="on">Companies</span><span>Settings</span></div>
+            <div class="p-search">Search…</div>
+          </div>
+          <div class="p-main">
+            <nav class="p-rail">
+              <div class="p-co">POCnation Ltd</div>
+              <a>Summary</a>
+              <a>Manage connections</a>
+              <div class="p-grp">Data</div>
+              <a>Accounting</a>
+              <a>Banking</a>
+              <a class="on">Upload bank statements <span class="p-new">New</span></a>
+              <a>Business documents</a>
+              <a>Lending</a>
+              <a>Reports</a>
+            </nav>
+            <div class="p-content">
+              <div class="s-h">Upload bank statements <span class="s-badge">Beta</span></div>
+              <div class="s-sub">Upload statement PDFs straight from the bank. We extract accounts, balances and transactions, and reconcile every statement.</div>
+              <div class="s-drop">
+                <div class="di">📥</div>
+                <div class="dt"><b>Choose files</b> or drag PDF statements here</div>
+                <div class="dm">Multiple statements &amp; multi-account PDFs supported</div>
+              </div>
+              <div class="p-uphead"><span class="ut">This upload</span><span class="uc">4 statements</span></div>
+              <div class="p-tblwrap">
+                <div class="p-tbl">
+                  <div class="p-th"><span>Statement</span><span>Pages</span><span>Reconciled</span><span>Transactions</span><span></span></div>
+                  <div class="p-tr"><span class="p-fn"><span class="fi">📄</span><span>florida-business-savings-jan-mar-2025.pdf<small>1.2 MB · uploaded just now</small></span></span><span class="p-num">11 pages</span><span class="p-rec yes">Yes</span><span class="p-num">415 txns</span><span class="p-act">View bank data</span></div>
+                  <div class="p-tr"><span class="p-fn"><span class="fi">📄</span><span>chase-business-complete-q2-2025.pdf<small>2.0 MB · uploaded just now</small></span></span><span class="p-num">21 pages</span><span class="p-rec no">No</span><span class="p-num">388 txns</span><span class="p-act">Review PDF</span></div>
+                  <div class="p-tr"><span class="p-fn"><span class="fi">📄</span><span>bofa-business-checking-q1-2025.pdf<small>0.6 MB · uploaded just now</small></span></span><span class="p-num">6 pages</span><span class="p-rec yes">Yes</span><span class="p-num">210 txns</span><span class="p-act">View bank data</span></div>
+                  <div class="p-tr"><span class="p-fn"><span class="fi">📄</span><span>barclays-current-account-q3-2025.pdf<small>1.1 MB · uploaded just now</small></span></span><span class="p-num">11 pages</span><span class="p-rec no">No</span><span class="p-num">175 txns</span><span class="p-act">Review PDF</span></div>
+                </div>
+              </div>
+              <div class="p-foot"><span>Extraction complete for reconciled statements</span><span>⤓ Download statements · 176 kb</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="muted reveal" style="font-size:12.5px;margin-top:18px;font-family:var(--mono);letter-spacing:.02em">Prototypes built in Claude Design. Screens above are faithful reproductions; example file names and figures are illustrative, not a client's real data.</p>
+  </div>
+</section>
+
+<!-- ARCHITECTURE / POC -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">From benchmark to buildable</span>
+      <h2>The architecture the PoC settled</h2>
+      <p>The proof of concept wasn't just "does it extract?" — it was where the build decisions got made. The headline one: split extraction from mapping, so the mapping logic (which changes constantly) can be re-run without paying to OCR the document again.</p>
+    </div>
+
+    <div class="sec-grid reveal">
+      <div class="pipe">
+        <div class="pnode"><div class="k">Step 1</div><h3>Extract</h3><p>OCR the PDF into raw fields — dates, descriptions, amounts, balances and statement metadata. The output is stored, so it's produced once.</p><div class="tech">Azure Document Intelligence</div></div>
+        <div class="pnode"><div class="k">Step 2</div><h3>Map</h3><p>A separate, re-runnable service maps raw output to Codat's contract: transaction dates, account type, reconciliation, grouping by account.</p><div class="tech">C# mapper · rules separated from ML</div></div>
+        <div class="pnode"><div class="k">Step 3</div><h3>Standardise</h3><p>Uploaded data lands in the same Banking data model as connected data, so everything downstream treats it identically.</p><div class="tech">Codat Banking: Transaction</div></div>
+        <div class="pnode"><div class="k">Step 4</div><h3>Enrich</h3><p>Codat's existing categorisation and Credit Model run on it — the whole point: an upload becomes as useful as a live connection.</p><div class="tech">Categorisation · Credit Model</div></div>
+      </div>
+
+      <p class="muted" style="font-size:13.5px;margin-top:16px;text-align:center">Under it, the MVP decisions that fell out of the PoC: auto-group multi-file uploads by account, infer the year on dateless transactions, reconcile balances at statement level, and label the data honestly as sourced from PDFs.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMMERCIAL -->
+<section id="commercial">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">The business case</span>
+      <h2>The commercial model that moved it out of red</h2>
+      <p>When the ROI was challenged, I built the case back up with GTM: a client-by-client revenue model with an explicit confidence rating on every line, set against a modelled running cost. The MVP is scoped to US processing — these are the US headline numbers.</p>
+    </div>
+
+    <div class="sec-grid">
+      <div class="comm reveal">
+        <div class="card">
+          <div class="k">Pricing · directional</div>
+          <h3>A two-tier model</h3>
+          <div class="price">
+            <div><b>Usage</b><span>~$10 per statement upload — the same shape as Lending API connectivity charges.</span></div>
+            <div><b>Platform</b><span>A per-annum product fee (~$10k+) for larger Tier 1 / Tier 2 clients, billed upfront and independent of ramp.</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="k">Running cost · modelled</div>
+          <h3>Cheap to run, at any realistic volume</h3>
+          <p>Azure Document Intelligence lists at ~$10 per 1,000 pages. Modelling 5,000 companies uploading quarterly gives a spread of roughly <b style="color:var(--ink);font-weight:600">$6k–$18k per year</b> depending on statement length — I took the high end as a deliberately conservative fixed cost.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-grid ev reveal">
+      <div class="tile"><div class="big">$310k</div><h3>Lead design partner</h3><p>Modelled year-one ARR from the Tier 1 design partner alone — the high-confidence anchor of the case.</p></div>
+      <div class="tile"><div class="big">~$405k</div><h3>US modelled opportunity</h3><p>Across the confidence-rated client model, ~$334k excluding every low-confidence line.</p></div>
+      <div class="tile"><div class="big">$6–18k</div><h3>Annual running cost</h3><p>Azure processing at realistic volume — the case cleared comfortably even at the conservative high end.</p></div>
+    </div>
+    <p class="muted reveal" style="font-size:12.5px;margin-top:12px;font-family:var(--mono);letter-spacing:.02em">Forecasts modelled with GTM, not booked revenue. A further ~$150k+ UK opportunity sits behind a UK-model decision and is excluded from the MVP case.</p>
+
+    <div class="callout reveal">
+      <div class="k">The shape of the argument</div>
+      <p>One high-confidence design partner alone modelled at ~$310k of year-one ARR — against a running cost of ~$18k at the top end. Even discounting every low-confidence line to zero, the US case cleared comfortably. That's what turned a red initiative back to amber and into a funded scope.</p>
+    </div>
+  </div>
+</section>
+
+<!-- RISK -->
+<section id="risk">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">De-risking the bet</span>
+      <h2>Four big risks — and how discovery moved them</h2>
+      <p>I assessed the opportunity against the four classic product risks and attacked the reddest first: feasibility was the most likely to be fatal, so the benchmark went before anything else. It retired feasibility for US data — and prototype testing then pulled usability and viability down to low as well, leaving no medium+ risk standing against the MVP.</p>
+    </div>
+    <div class="sec-grid risks reveal">
+      <div class="risk low">
+        <span class="rb"></span>
+        <span class="lvl"><span class="d"></span>Low</span>
+        <h3>Value / desirability</h3>
+        <p>Do borrowers and lenders actually want this?</p>
+        <div class="rz"><b>What we found</b>Strong, repeated demand — survey data, active design partners, and prospects lost for the want of it.</div>
+      </div>
+      <div class="risk low">
+        <span class="rb"></span>
+        <span class="lvl"><span class="d"></span>Medium → Low</span>
+        <h3>Usability</h3>
+        <p>Is the review workflow fast enough to beat the lender's status quo?</p>
+        <div class="rz"><b>How we moved it</b>Prototype testing showed a straightforward path for the MVP to test — the review flow flags only low-confidence rows, comfortably inside the 2-day decision window borrowers expect.</div>
+      </div>
+      <div class="risk med">
+        <span class="rb"></span>
+        <span class="lvl"><span class="d"></span>Medium → lower</span>
+        <h3>Feasibility</h3>
+        <p>Is extraction accurate enough to underwrite on?</p>
+        <div class="rz"><b>How we moved it</b>The 71-statement benchmark retired the core unknown for US data and turned "unknown accuracy" into understood, fixable edge cases.</div>
+      </div>
+      <div class="risk low">
+        <span class="rb"></span>
+        <span class="lvl"><span class="d"></span>Medium → Low</span>
+        <h3>Viability</h3>
+        <p>Does the economic &amp; legal case hold?</p>
+        <div class="rz"><b>How we moved it</b>The MVP reuses existing models, and the data-residency approach didn't impact client agreements — so the commercial and contractual case held without new legal exposure.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUILD / OUTCOME -->
+<section id="build">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Into delivery</span>
+      <h2>Scoped, and moving into engineering</h2>
+      <p>Discovery ended where it should — not in a deck, but in a scoped MVP the squad could start. The first engineering stories are cut straight from the PoC findings and the PRD's non-functional requirements.</p>
+    </div>
+    <div class="sec-grid build reveal">
+      <div class="bcard"><div class="tk">Infrastructure</div><h3>Provision the model, securely</h3><p>Stand up Azure Document Intelligence in Terraform with a managed identity — inside Codat's VNET behind a private endpoint, no data retention, processing in-region, per the PRD's security requirements.</p></div>
+      <div class="bcard"><div class="tk">Mapping</div><h3>Harden the extraction edge cases</h3><p>The known failure modes become concrete stories: infer the year on dateless transactions, group multi-file uploads by account, reconcile balances at statement level.</p></div>
+      <div class="bcard"><div class="tk">Scope discipline</div><h3>US-first, UK deferred</h3><p>The MVP is deliberately US-only — the evidence supported it and the UK needs a different model. That kept the scope honest and the first release shippable.</p></div>
+    </div>
+
+    <div class="quotes reveal">
+      <div class="quote"><p>"For our large merchants we still collect banking data manually — PDF statements, reviewed by hand."</p><div class="src">— Lead design partner (US POS platform)</div></div>
+      <div class="quote"><p>"A significant number of our borrowers hit Plaid failures — we're actively looking at intelligent file upload."</p><div class="src">— UK revenue-based lender</div></div>
+      <div class="quote"><p>"We'd want the revenue categorised from an uploaded statement, not only from a live API connection."</p><div class="src">— Embedded-finance lender</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- REFLECTION -->
+<section id="reflection">
+  <div class="wrap close reveal">
+    <div>
+      <span class="eyebrow">Reflection</span>
+      <h2>Getting the team comfortable with a moving target</h2>
+      <p>Bank statements have no perfect answer — formats vary, confidence scores wobble, an upload never behaves like a clean API feed. The real work wasn't the benchmark; it was getting engineering comfortable building for that ambiguity instead of designing it away. I pushed the squad to ship the smallest thing we could test against real statements and treat "good enough to learn from" as the goal, not perfection.</p>
+      <p>The unlock was proximity to the client. I ran a deep workflow call with a large fintech and opened it to the whole squad — how they handle manual uploads, their own OCR and its accuracy, where underwriters step in. For engineers who'd only seen the data model, watching a real workflow made the problem concrete and the ambiguity testable.</p>
+    </div>
+    <div class="next">
+      <div class="k">What moved the team</div>
+      <p style="color:var(--muted);margin-top:14px;font-size:14.5px;line-height:1.6">One deep-dive call did more for shared conviction than any spec — the people building it heard the questions and saw the friction first-hand.</p>
+      <p style="font-family:var(--display);font-weight:600;font-size:15.5px;line-height:1.42;color:var(--ink);margin-top:18px;border-left:3px solid var(--cool);padding-left:15px">"It helped me a lot more seeing a lender's workflow — it's given us great first-level insight into the problems we're trying to solve."</p>
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:11px;padding-left:15px">— Colleague, after the client workshop</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div class="n">Hannah Mansour · Senior PM, Lending</div>
+    <div class="m">Case study · Intelligent Upload for Banking Data, Codat · 2026. Client names redacted to segment; figures are internal forecasts and benchmarks, shared to show approach, not to disclose commercials.</div>
+  </div>
+</footer>
+
+<script>
+  document.documentElement.classList.add('has-js');
+  (function(){
+    var io;
+    var els=[].slice.call(document.querySelectorAll('.reveal'));
+    if(!('IntersectionObserver' in window)||window.matchMedia('(prefers-reduced-motion: reduce)').matches){return;}
+    els.forEach(function(el){var r=el.getBoundingClientRect();if(r.top>window.innerHeight+40){el.classList.add('pre');}});
+    io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){if(e.isIntersecting){e.target.classList.remove('pre');io.unobserve(e.target);}});
+    },{rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(el){if(el.classList.contains('pre')){io.observe(el);}});
+  })();
+</script>
+</body>
+</html>

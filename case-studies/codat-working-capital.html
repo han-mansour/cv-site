@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Working Capital, Reimagined</title>
+<meta name="description" content="A product discovery case study on the working-capital module of Codat's Advisory Intelligence platform and MCP.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    color-scheme: dark;
+    --bg:        #0d0f13;
+    --bg-2:      #12151b;
+    --surface:   #161a22;
+    --surface-2: #1c212b;
+    --line:      #272d38;
+    --line-soft: #1f242e;
+    --ink:       #eef1f6;
+    --ink-2:     #b7c0cd;
+    --ink-3:     #828d9c;
+    --ink-4:     #5c6675;
+    --api:       #6ea3f2;   /* structured · on the record · API */
+    --api-dim:   #2b3a54;
+    --mcp:       #b9a4f2;   /* exploratory · in conversation · AI tool */
+    --mcp-dim:   #383056;
+    --good:      #63b58f;
+    --warn:      #bfa9f5;
+    --stop:      #d97a72;
+    --maxw: 720px;
+    --gutter: 22px;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    font-weight:400;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  ::selection{background:var(--mcp);color:#17122e}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--gutter)}
+  .band{padding-block:clamp(44px,8vw,86px);border-top:1px solid var(--line-soft)}
+  .band:first-of-type{border-top:0}
+
+  h1,h2,h3,h4{font-family:"Fraunces", Georgia, serif;font-weight:600;text-wrap:balance;line-height:1.12;margin:0}
+  h2{font-size:clamp(1.6rem,4.4vw,2.35rem);letter-spacing:-.01em}
+  h3{font-size:clamp(1.16rem,2.8vw,1.4rem);font-weight:600;line-height:1.2}
+  p{margin:0}
+  a{color:inherit}
+
+  .eyebrow{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--ink-4);
+  }
+  .lede{font-size:1.12rem;color:var(--ink-2);line-height:1.62}
+  .stack{display:flex;flex-direction:column}
+  .prose > * + *{margin-top:1.05em}
+  .prose p{color:var(--ink-2)}
+  .prose strong{color:var(--ink);font-weight:600}
+
+  /* ---- sticky nav ---- */
+  nav.top{
+    position:sticky;top:env(safe-area-inset-top,0px);z-index:40;
+    background:color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter:saturate(140%) blur(10px);
+    border-bottom:1px solid var(--line-soft);
+  }
+  nav.top .wrap{display:flex;align-items:center;gap:14px;height:52px}
+  nav.top .brand{font-family:"IBM Plex Mono",monospace;font-size:.74rem;letter-spacing:.12em;color:var(--ink-3);white-space:nowrap}
+  nav.top .brand b{color:var(--ink);font-weight:500}
+  nav.top .links{display:flex;gap:16px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+  nav.top .links::-webkit-scrollbar{display:none}
+  nav.top .links a{
+    font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.04em;
+    color:var(--ink-3);text-decoration:none;white-space:nowrap;padding:4px 0;
+    border-bottom:1.5px solid transparent;transition:color .2s,border-color .2s;
+  }
+  nav.top .links a:hover{color:var(--ink)}
+  nav.top .links a.active{color:var(--ink);border-color:var(--mcp)}
+
+  /* ---- hero ---- */
+  .hero{padding-top:clamp(48px,10vw,96px)}
+  .hero .kicker{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:26px}
+  .hero h1{
+    font-size:clamp(2.5rem,8.6vw,4.15rem);font-weight:600;letter-spacing:-.02em;line-height:1.02;
+    margin:0 0 22px;
+  }
+  .hero h1 em{font-style:italic;font-weight:400;color:var(--mcp)}
+  .hero .sub{font-size:clamp(1.1rem,2.7vw,1.32rem);color:var(--ink-2);max-width:34ch;line-height:1.5}
+
+  .meta{
+    margin-top:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));
+    gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:12px;overflow:hidden;
+  }
+  .meta div{background:var(--bg);padding:15px 16px}
+  .meta dt{font-family:"IBM Plex Mono",monospace;font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-4);margin-bottom:6px}
+  .meta dd{margin:0;font-size:.9rem;color:var(--ink);line-height:1.35}
+
+  /* chips */
+  .chip{
+    display:inline-flex;align-items:center;gap:7px;
+    font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.06em;
+    padding:5px 10px;border-radius:100px;border:1px solid var(--line);color:var(--ink-2);white-space:nowrap;
+  }
+  .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--ink-3)}
+  .chip.api{border-color:var(--api-dim);color:#a9c6f5}
+  .chip.api .dot{background:var(--api)}
+  .chip.mcp{border-color:var(--mcp-dim);color:#d3c6f8}
+  .chip.mcp .dot{background:var(--mcp)}
+  .chip.both{border-color:#3a3550;color:#c3b6de}
+  .chip.both .dot{background:linear-gradient(90deg,var(--api) 50%,var(--mcp) 50%)}
+  .chip.status{border-color:var(--line);color:var(--ink-2)}
+  .chip.status .dot{background:var(--warn)}
+
+  .section-head{display:flex;flex-direction:column;gap:12px;margin-bottom:30px}
+
+  /* before / after */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+  .ba .col{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .ba .col h4{font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;font-weight:500;margin-bottom:14px}
+  .ba .now h4{color:var(--stop)}
+  .ba .next h4{color:var(--good)}
+  .ba ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:11px}
+  .ba li{font-size:.92rem;color:var(--ink-2);padding-left:18px;position:relative;line-height:1.45}
+  .ba li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;border-radius:1px;background:var(--ink-4)}
+  .ba .now li::before{background:var(--stop);opacity:.7}
+  .ba .next li::before{background:var(--good);opacity:.8}
+
+  /* insight cards */
+  .cards{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+  .icard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 22px 20px;position:relative}
+  .icard .n{font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--ink-4);letter-spacing:.1em}
+  .icard h3{margin:10px 0 9px}
+  .icard p{color:var(--ink-2);font-size:.96rem}
+  .icard .src{margin-top:14px;font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:.03em;color:var(--ink-4);display:flex;gap:8px;flex-wrap:wrap}
+  .icard .src span{border:1px solid var(--line-soft);border-radius:5px;padding:3px 7px}
+  .quote{border-left:2px solid var(--mcp);padding:2px 0 2px 16px;margin-top:14px;font-style:italic;color:var(--ink);font-size:.98rem;line-height:1.5}
+  .quote cite{display:block;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:.08em;color:var(--ink-4);margin-top:8px}
+
+  /* method steps */
+  .method{display:grid;grid-template-columns:1fr;gap:1px;background:var(--line-soft);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:8px}
+  .mrow{background:var(--bg-2);padding:20px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
+  .mrow .mi{font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--mcp);padding-top:3px;white-space:nowrap}
+  .mrow h4{font-size:1.02rem;font-family:"IBM Plex Sans",sans-serif;font-weight:600;margin-bottom:6px}
+  .mrow p{font-size:.9rem;color:var(--ink-2);line-height:1.5}
+
+  .whostrip{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+
+  /* question set */
+  .qset{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+  .q{background:var(--surface);border:1px solid var(--line);border-left:2px solid var(--mcp);border-radius:0 12px 12px 0;padding:15px 18px}
+  .q .qq{font-family:"Fraunces",serif;font-size:1.02rem;color:var(--ink);font-style:italic;line-height:1.35}
+  .q .qa{font-size:.84rem;color:var(--ink-3);margin-top:7px;line-height:1.45}
+  .qa b{color:var(--ink-2);font-weight:500}
+
+  /* the boundary / six jobs */
+  .rule-line{font-family:"Fraunces",serif;font-size:clamp(1.25rem,3.4vw,1.7rem);font-style:italic;color:var(--ink);line-height:1.35;text-wrap:balance}
+  .rule-line b{font-style:normal;font-weight:600}
+  .jobs{display:flex;flex-direction:column;gap:1px;background:var(--line-soft);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:24px}
+  .job{background:var(--bg-2);display:grid;grid-template-columns:1fr auto;gap:12px 16px;padding:16px 18px;align-items:start}
+  .job .jl h4{font-size:1rem;font-family:"IBM Plex Sans",sans-serif;font-weight:600;color:var(--ink);margin-bottom:3px}
+  .job .jl .who{font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-4)}
+  .job .jl p{font-size:.86rem;color:var(--ink-3);margin-top:7px;line-height:1.45}
+  .job .verdict{align-self:center}
+
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px}
+
+  /* personas */
+  .personas{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+  .persona{border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--surface)}
+  .persona.rm{border-top:2px solid var(--mcp)}
+  .persona.credit{border-top:2px solid var(--api)}
+  .persona h3{font-size:1.05rem;margin-bottom:4px}
+  .persona .role{font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4);margin-bottom:14px}
+  .persona p{font-size:.9rem;color:var(--ink-2);line-height:1.5}
+  .persona .tag{margin-top:14px;display:inline-block}
+
+  /* status tiles */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:8px}
+  .tile{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:18px}
+  .tile .big{font-family:"Fraunces",serif;font-size:1.7rem;font-weight:600;color:var(--ink);line-height:1.05;font-variant-numeric:tabular-nums}
+  .tile .lab{font-size:.82rem;color:var(--ink-3);margin-top:9px;line-height:1.35}
+  .tile.hl .big{color:var(--mcp)}
+
+  /* gaps list */
+  .gaps{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+  .gap{display:grid;grid-template-columns:auto 1fr;gap:14px;background:var(--bg-2);border:1px solid var(--line-soft);border-radius:12px;padding:16px 18px;align-items:start}
+  .gap .k{font-family:"IBM Plex Mono",monospace;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--warn);border:1px solid var(--mcp-dim);border-radius:5px;padding:4px 8px;white-space:nowrap;margin-top:2px}
+  .gap p{font-size:.9rem;color:var(--ink-2);line-height:1.45}
+  .gap p b{color:var(--ink)}
+
+  .callout{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:22px;margin-top:24px}
+  .callout .eyebrow{margin-bottom:12px;display:block}
+  .callout p{color:var(--ink-2);font-size:.95rem}
+  .callout p + p{margin-top:.9em}
+
+  footer{border-top:1px solid var(--line-soft);padding-block:40px 60px;color:var(--ink-4)}
+  footer .wrap{display:flex;flex-direction:column;gap:14px}
+  footer p{font-size:.8rem;line-height:1.55;color:var(--ink-4)}
+  footer .note{font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:.03em}
+
+  @media (max-width:560px){
+    .ba{grid-template-columns:1fr}
+    .personas{grid-template-columns:1fr}
+    .job{grid-template-columns:1fr}
+    .job .verdict{justify-self:start}
+    .mrow{grid-template-columns:1fr;gap:8px}
+  }
+  @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  html{scroll-behavior:smooth}
+  :focus-visible{outline:2px solid var(--mcp);outline-offset:3px;border-radius:3px}
+  [id]{scroll-margin-top:70px}
+</style>
+</head>
+<body>
+<nav class="top">
+  <div class="wrap">
+    <span class="brand"><b>WORKING CAPITAL</b> · CASE STUDY</span>
+    <div class="links">
+      <a href="#start">Problem</a>
+      <a href="#usecase">Use case</a>
+      <a href="#method">How we ran it</a>
+      <a href="#heard">What we heard</a>
+      <a href="#questions">The question set</a>
+      <a href="#boundary">The boundary</a>
+      <a href="#stands">Where it stands</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero band" id="top">
+  <div class="wrap stack">
+    <div class="kicker">
+      <span class="chip"><span class="dot"></span>Codat · Advisory Intelligence platform + MCP</span>
+      <span class="chip status"><span class="dot"></span>In discovery</span>
+    </div>
+    <h1>Working capital,<br><em>reimagined</em></h1>
+    <p class="sub">Discovery for a working-capital advisory layer that lives on the AI tools a bank already runs — and what it taught us.</p>
+
+    <dl class="meta">
+      <div><dt>My role</dt><dd>Product — co-led<br>the discovery</dd></div>
+      <div><dt>The module</dt><dd>Working Capital,<br>within the platform + MCP</dd></div>
+      <div><dt>Stage</dt><dd>Discovery →<br>platform MVP</dd></div>
+      <div><dt>Span</dt><dd>Jun – Sep 2026</dd></div>
+    </dl>
+  </div>
+</header>
+
+<section class="band" id="brief">
+  <div class="wrap prose">
+    <p class="eyebrow">The one-paragraph version</p>
+    <p class="lede" style="margin-top:16px">Banks hold their customers' consented financial data and still can't act on it fast enough. The bet is a <strong>bank-controlled advisory layer</strong>: a relationship manager asks a question in their own Copilot — "where is this client leaving working capital on the table?" — and Codat's <strong>Advisory Intelligence platform</strong>, reached through <strong>MCP</strong>, answers it against permissioned, harmonised accounting and banking data. Not AI-led underwriting. An insight and next-best-action layer for the people who advise the customer.</p>
+    <p style="margin-top:20px">This is a discovery case study for the working-capital module of that platform. It's honest about status: the platform is real and demoed, and it isn't live with a bank yet. What follows is how we ran the discovery, who we spoke to, what they told us, and the calls that came out of it.</p>
+  </div>
+</section>
+
+<section class="band" id="start">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">01 — Where this started</p>
+      <h2>The advisor who can't advise</h2>
+      <p class="lede">A relationship manager is meant to be a strategic advisor. Most of the week, they're a data janitor — chasing and cleaning fragmented client data instead of using it.</p>
+    </div>
+    <div class="prose" style="margin-bottom:26px">
+      <p>The picture a client needs to be advised on is split in two: the bank's own transaction ledgers on one side, the client's accounting or ERP system on the other. Stitching them together is manual — exports, spreadsheets, keyed-in figures — so recommendations arrive late, get pitched reactively after the client already asked, and can't be backed with a number. On the bank floor it shows up as speed: a working-capital need the bank can't respond to in time, and the revenue and the relationship both walk to a fintech.</p>
+    </div>
+    <div class="ba">
+      <div class="col now">
+        <h4>How it works today</h4>
+        <ul>
+          <li>Client data split across the bank's ledgers and the client's ERP</li>
+          <li>Pulled together by hand — exports, spreadsheets, re-keying</li>
+          <li>Advisors sell reactively, after the client asks</li>
+          <li>Recommendations can't be quantified, so clients don't act</li>
+          <li>Working-capital needs lost on speed to a fintech</li>
+        </ul>
+      </div>
+      <div class="col next">
+        <h4>What the data makes possible</h4>
+        <ul>
+          <li>Bank and accounting data harmonised in one place</li>
+          <li>The RM asks in plain language and gets a grounded answer</li>
+          <li>Opportunities surfaced before the client goes looking</li>
+          <li>Recommendations sized, so the value is provable</li>
+          <li>Advice that fits the client's actual position</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="usecase">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">02 — The use case</p>
+      <h2>An advisory layer, not an underwriter</h2>
+      <p class="lede">The working-capital thesis is a relationship-manager insight layer — bank-side, on the bank's own AI tool, powered by consented data it can already reach.</p>
+    </div>
+    <div class="prose" style="margin-bottom:22px">
+      <p>An RM works inside the Copilot the bank already runs and asks, in their own words, where a client's working capital is trapped: DSO, DPO and DIO trends, AR ageing and customer concentration, what changed since last quarter and why. Codat sources and harmonises the financials; the bank's own relationship context meets it at the surface; Copilot does the final synthesis. The output is a pre-meeting brief, an identified opportunity, a sized recommendation, a drafted client note — the next-best action, grounded in the numbers.</p>
+      <p>The move it represents is from a bank that <strong>reacts to product requests</strong> to one that <strong>advises proactively</strong> across its book — and, for Codat, from selling data to answering questions with it.</p>
+    </div>
+    <div class="callout">
+      <span class="eyebrow">The distinction that holds the product together</span>
+      <p class="rule-line"><b>Underwrite on the API. Explore on the AI tool.</b> The application is where one becomes the other.</p>
+      <p style="margin-top:16px">Everything that lands on the record — a limit, a decision, a figure inside a model — goes through the API, where it's deterministic and reproducible. Everything before it — is this worth taking further, what should I lead with, what else does this client need — is a conversation, and that's where the AI tool earns its place. Keeping that line clear is what stopped the working-capital module from quietly turning into an underwriting one.</p>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="method">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">03 — How we ran the discovery</p>
+      <h2>We treated it as discovery, not a pitch</h2>
+      <p class="lede">The earlier version of this idea failed by exposing data without ever proving who used it or why. So we set a discipline: no module earns a build until the whole chain is proven.</p>
+    </div>
+
+    <div class="method">
+      <div class="mrow">
+        <span class="mi">METHOD</span>
+        <div>
+          <h4>Built a discussion guide around three moves</h4>
+          <p>How they work today, what actually hurts, and what they'd automate first. Thirty-to-forty-five-minute calls with relationship managers, treasury consultants and credit teams — plus non-bank lenders — walking each through a working-capital prototype to see where it plugged into their week.</p>
+        </div>
+      </div>
+      <div class="mrow">
+        <span class="mi">PERSONA</span>
+        <div>
+          <h4>Named the user and the job to be done</h4>
+          <p>The relationship manager and treasury consultant at a commercial bank: someone under pressure to advise, stuck doing data assembly. The job is to diagnose where a client's cash is trapped, spot the opportunity, and bring a recommendation they can prove.</p>
+        </div>
+      </div>
+      <div class="mrow">
+        <span class="mi">SURFACE</span>
+        <div>
+          <h4>Tested where it fits in the workflow</h4>
+          <p>Every prototype session probed the same fork: is this a <em>portfolio scan</em> across the whole book, or a <em>client-level deep dive</em> for one advisory conversation? Business-review prep, monitoring, or a one-to-one call? The answer shapes the product, so we made people choose.</p>
+        </div>
+      </div>
+      <div class="mrow">
+        <span class="mi">GATE</span>
+        <div>
+          <h4>Held every module to one commercial proof</h4>
+          <p>ERP input → named user and workflow → bank outcome → measurable ROI. No proof, no build. It's the rule that keeps the roadmap from expanding on assumption and gives the MCP a governed catalogue of which modules exist and who they serve.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="whostrip">
+      <span class="chip"><span class="dot"></span>Commercial banks · ×3</span>
+      <span class="chip"><span class="dot"></span>Non-bank lenders · ×3</span>
+      <span class="chip"><span class="dot"></span>RM · Treasury · Credit</span>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="heard">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">04 — What we heard</p>
+      <h2>The signal was unusually consistent</h2>
+      <p class="lede">Across banks and lenders the same themes came back — and in a couple of places they said our own thesis back to us, unprompted.</p>
+    </div>
+    <div class="cards">
+
+      <div class="icard">
+        <span class="n">INSIGHT 01</span>
+        <h3>They want answers, not raw data</h3>
+        <p>Two non-bank lenders independently asked us to <em>answer their questions and return insights</em> — revenue and margin trends, cash-flow explanations, distress signals — rather than hand back records they dig through themselves. That's exactly how we'd framed the module, so hearing it come back unprompted was the strongest validation of the direction.</p>
+        <div class="quote">"Instead of low-level calls like <code>get_transactions()</code>, we'd like <code>search_financial_data(prompt)</code> — show revenue trends, explain the change in opex, identify signs of financial distress."<cite>— CTO, SMB revenue-based lender</cite></div>
+        <div class="src"><span>Discovery · 2 lenders</span></div>
+      </div>
+
+      <div class="icard">
+        <span class="n">INSIGHT 02</span>
+        <h3>The value is the sources combined — with a domain-aware check</h3>
+        <p>The useful layer isn't any one source; it's accounting, banking and financials reasoned over together. A lender already running its own AI over its data warehouse named the specific gap: checks raw data can't answer on its own — is the reconciliation clean, are the books actually closed through last month.</p>
+        <div class="src"><span>Discovery · venture-debt lender</span></div>
+      </div>
+
+      <div class="icard">
+        <span class="n">INSIGHT 03</span>
+        <h3>Nobody is ready to let AI make the decision</h3>
+        <p>Everyone we spoke to already uses Copilot or Claude day to day — and none will let AI make the call yet. The early wins they name are the same two: <strong>portfolio monitoring</strong>, and <strong>the tricky one-off case</strong>. That maps straight onto the boundary — the decision stays deterministic; the exploration around it is where the AI tool belongs.</p>
+        <div class="src"><span>Discovery · 3 lenders</span></div>
+      </div>
+
+      <div class="icard">
+        <span class="n">INSIGHT 04</span>
+        <h3>The advisory pull is real — and points past the wedge</h3>
+        <p>Bank stakeholders want a <em>pull-based, holistic view</em> across a client's relationships to open a review with — and nearly every senior person in the room asked for a <strong>portfolio / leadership view</strong> we don't yet show. We also heard an organic pull toward <strong>AR and working capital ahead of the card-led entry point</strong>, which reordered how we think about sequencing modules.</p>
+        <div class="src"><span>Discovery · commercial banks</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="band" id="questions">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">05 — The output</p>
+      <h2>The question set we handed the platform</h2>
+      <p class="lede">Discovery only counts if it turns into something buildable. We translated the working-capital job into the RM questions the MCP has to answer — and the data contract behind each one.</p>
+    </div>
+    <div class="qset">
+      <div class="q"><p class="qq">"Where is this client leaving working capital on the table?"</p><p class="qa"><b>Needs:</b> early vs late payments, DPO against terms, specific extend-or-discount opportunities.</p></div>
+      <div class="q"><p class="qq">"Give me DSO, DPO and DIO — and how they've trended over 12–24 months."</p><p class="qa"><b>Needs:</b> P&amp;L, balance sheet, and inventory for the full cash-conversion cycle.</p></div>
+      <div class="q"><p class="qq">"Break down their AR ageing — current, 1–30, 31–60, 61–90, 90+."</p><p class="qa"><b>Needs:</b> AR aged buckets, derived from invoice due dates against today.</p></div>
+      <div class="q"><p class="qq">"Where's the biggest opportunity — receivables, inventory, or payables?"</p><p class="qa"><b>Needs:</b> a data-grounded answer specific to this client, not a generic benchmark.</p></div>
+      <div class="q"><p class="qq">"Show me their customer concentration and who's paying late."</p><p class="qa"><b>Needs:</b> outstanding invoices by counterparty, on-time behaviour, concentration risk.</p></div>
+    </div>
+    <div class="callout">
+      <span class="eyebrow">One discipline that came straight out of the data</span>
+      <p>Inventory isn't present in every ERP — and without it, the cash-conversion cycle is incomplete. The call we made: the platform flags when it's missing rather than returning a confident-looking number that's quietly wrong. Trust is the whole basis of the pitch, and a fabricated CCC would spend it.</p>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="boundary">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">06 — The boundary that came out of discovery</p>
+      <h2>Six jobs, two ways in</h2>
+      <p class="lede">"Can we get this data into the AI tool" is usually two asks wearing one sentence. Mapping the jobs is what makes the module sellable without over-promising.</p>
+    </div>
+
+    <div class="legend">
+      <span class="chip api"><span class="dot"></span>API — on the record</span>
+      <span class="chip mcp"><span class="dot"></span>AI tool — a conversation</span>
+      <span class="chip both"><span class="dot"></span>Both</span>
+    </div>
+
+    <div class="jobs">
+      <div class="job">
+        <div class="jl"><h4>Pre-screen</h4><span class="who">Relationship manager</span><p>Is this worth a formal application? Which of these five do I work first? Nothing is kept, so a wrong answer costs nothing.</p></div>
+        <div class="verdict"><span class="chip mcp"><span class="dot"></span>AI tool</span></div>
+      </div>
+      <div class="job">
+        <div class="jl"><h4>Underwrite</h4><span class="who">Credit analyst</span><p>The full standardised set, every applicant, reproducible for audit. Feeds the decisioning engine.</p></div>
+        <div class="verdict"><span class="chip api"><span class="dot"></span>API</span></div>
+      </div>
+      <div class="job">
+        <div class="jl"><h4>Credit memo</h4><span class="who">Credit analyst</span><p>Figures from the API; the narrative, the committee pushback, the re-angling around them from the AI tool — reading a retrieved report, not re-deriving the numbers.</p></div>
+        <div class="verdict"><span class="chip both"><span class="dot"></span>Both</span></div>
+      </div>
+      <div class="job">
+        <div class="jl"><h4>Decision &amp; limit</h4><span class="who">Credit officer / committee</span><p>On the record, and reproducible later. No conversation to be had.</p></div>
+        <div class="verdict"><span class="chip api"><span class="dot"></span>API</span></div>
+      </div>
+      <div class="job">
+        <div class="jl"><h4>Monitoring &amp; review</h4><span class="who">RM &amp; credit</span><p>"Test this covenant monthly and alert me" is a pipeline. "What's changed for this client, and does it matter?" is a conversation.</p></div>
+        <div class="verdict"><span class="chip both"><span class="dot"></span>Both</span></div>
+      </div>
+      <div class="job">
+        <div class="jl"><h4>Next best product</h4><span class="who">Relationship manager</span><p>Once the facility is written, what else does this client need? The RM doesn't know their next question. The strongest AI-tool fit in the whole workflow.</p></div>
+        <div class="verdict"><span class="chip mcp"><span class="dot"></span>AI tool</span></div>
+      </div>
+    </div>
+
+    <div class="personas">
+      <div class="persona rm">
+        <h3>The relationship manager</h3>
+        <p class="role">Works almost entirely on the AI tool</p>
+        <p>Exploratory by nature — pre-screening, opportunity spotting, next-best-product, pre-meeting briefs. This is where MCP is unambiguously the right surface, and it's the working-capital module's core user.</p>
+        <span class="tag chip mcp"><span class="dot"></span>Explore</span>
+      </div>
+      <div class="persona credit">
+        <h3>The credit team</h3>
+        <p class="role">Works on both — and asks how it reproduces</p>
+        <p>They'll want the state of the data <em>on the day of approval</em>, and a calculation path model risk will accept. Anything inside a validated model, the caller has to be software. That constraint is a feature of the design, not a limit on it.</p>
+        <span class="tag chip api"><span class="dot"></span>On the record</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="stands">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">07 — Where it stands</p>
+      <h2>Real, demoed, not yet live</h2>
+      <p class="lede">The honest status matters — internally and in a client conversation. Selling this as live would spend the trust the whole thing depends on.</p>
+    </div>
+
+    <div class="tiles" style="margin-bottom:8px">
+      <div class="tile"><div class="big">Discovery</div><div class="lab">Working Capital, scoped inside Treasury Insights</div></div>
+      <div class="tile"><div class="big">Read-only</div><div class="lab">the "ask it" MCP query path is what's demoed today</div></div>
+      <div class="tile hl"><div class="big">Jan '27</div><div class="lab">target for the first bank live, bound by bank cycles</div></div>
+    </div>
+
+    <div class="section-head" style="margin-top:44px;margin-bottom:18px">
+      <p class="eyebrow">The open questions we're carrying</p>
+      <h3 style="font-family:'Fraunces',serif">What still has to be true</h3>
+    </div>
+    <div class="gaps">
+      <div class="gap"><span class="k">Scope</span><p><b>Which modules make the cut, and which are Day-1.</b> Narrowing to a handful, then the one-to-three for a lighthouse bank — and settling whether <b>AR is its own module or folded into working capital</b>.</p></div>
+      <div class="gap"><span class="k">Surface</span><p><b>The portfolio / leadership view isn't built.</b> Every senior stakeholder asked for it and it's the thing that isn't demoed. The client deep dive is further along than the book-level scan.</p></div>
+      <div class="gap"><span class="k">The loop</span><p><b>Capturing outcomes isn't designed yet</b> — the biggest hole. Questions and actions are logged through MCP; closing question → action → outcome is what compounds the platform, and it's still on paper.</p></div>
+      <div class="gap"><span class="k">Data</span><p><b>Expansion is mostly a consent and storage problem, not new integrations.</b> Coverage is strong on the common ERPs, thin on the long tail — and inventory gaps break the cash-conversion cycle where they land.</p></div>
+      <div class="gap"><span class="k">Trust</span><p><b>Governance, consent and AI-governance sign-off gate deployment.</b> The bank's central AI team holds the cards on how the pieces connect, and that approval runs longer than the field expects.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="reflect">
+  <div class="wrap prose">
+    <p class="eyebrow">08 — Reflection</p>
+    <h2 style="margin:14px 0 20px">What we'd carry forward</h2>
+    <p>The most useful thing we did wasn't a feature — it was insisting on the boundary. "Can we get this data into the AI tool" sounds like one request and is almost always two: the financials a banker wants to explore, and the scored output that feeds a decision. Splitting them early kept the discovery honest and stopped the working-capital module drifting into a job it isn't built for.</p>
+    <p style="margin-top:18px">The second lesson is to sequence conviction and confidence separately. Conviction on the destination — bank-controlled advisory, on the bank's own AI, powered by consented data — is high and shared. Confidence on the dates falls away the further out you read, and it should. The job isn't to pretend otherwise. It's to prove one module's chain end to end, and let the rest earn their place one proof at a time.</p>
+    <p style="margin-top:18px">And none of it moves at software speed. Getting one of the world's leading banks to yes means clearing its central AI team, its credit function and its consent process — any one of which can hold up the whole thing, and did, for longer than we expected. The surface isn't ours to move either: it runs on the bank's own Copilot, so the roadmap leans on Microsoft as much as on us. The hard part of reimagining what's possible was rarely the idea. It was aligning parties who each move on their own clock.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="note">CASE STUDY · WORKING CAPITAL DISCOVERY · ADVISORY INTELLIGENCE + MCP · SEP 2026</p>
+    <p>A product discovery case study. Client, partner and colleague names are omitted; figures are shown as anonymised aggregates only. Synthesised from customer-discovery guides and notes, the MCP test-question set, module-discovery scoping, product-strategy documentation and internal working sessions.</p>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var links = Array.prototype.slice.call(document.querySelectorAll('nav.top .links a'));
+    var map = {};
+    links.forEach(function(a){ var id = a.getAttribute('href').slice(1); var el = document.getElementById(id); if(el) map[id] = a; });
+    var ids = Object.keys(map);
+    if(!('IntersectionObserver' in window) || !ids.length) return;
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          links.forEach(function(l){ l.classList.remove('active'); });
+          if(map[e.target.id]) map[e.target.id].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+    ids.forEach(function(id){ var el = document.getElementById(id); if(el) obs.observe(el); });
+  })();
+</script>
+</body>
+</html>

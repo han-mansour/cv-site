@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Categorization First Principles</title>
+<style>
+  :root {
+    --canvas: #ECEDE5;
+    --echo: #E0E9D1;
+    --bedrock: #18103A;
+    --emerald: #21524F;
+    --mint: #B2D4C7;
+    --gravity: #6482A7;
+    --citron: #D1E100;
+
+    --bg: var(--canvas);
+    --surface: #FFFFFF;
+    --surface-2: var(--echo);
+    --ink: var(--bedrock);
+    --ink-soft: rgba(24, 16, 58, 0.68);
+    --border: rgba(24, 16, 58, 0.16);
+    --fact-fg: var(--canvas);
+    --assum-border: var(--gravity);
+    --assum-fg: var(--gravity);
+    --conv-border: #8a7a3f;
+    --conv-fg: #6b5e2f;
+    --conv-pattern: rgba(178, 212, 199, 0.55);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #100b28;
+      --surface: #1d1543;
+      --surface-2: #251c52;
+      --ink: var(--canvas);
+      --ink-soft: rgba(236, 237, 229, 0.72);
+      --border: rgba(236, 237, 229, 0.18);
+      --assum-fg: #a9c2dc;
+      --assum-border: #a9c2dc;
+      --conv-fg: #d8cf8f;
+      --conv-border: #d8cf8f;
+      --conv-pattern: rgba(178, 212, 199, 0.16);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #100b28;
+    --surface: #1d1543;
+    --surface-2: #251c52;
+    --ink: var(--canvas);
+    --ink-soft: rgba(236, 237, 229, 0.72);
+    --border: rgba(236, 237, 229, 0.18);
+    --assum-fg: #a9c2dc;
+    --assum-border: #a9c2dc;
+    --conv-fg: #d8cf8f;
+    --conv-border: #d8cf8f;
+    --conv-pattern: rgba(178, 212, 199, 0.16);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 0 20px;
+  }
+
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding-block: 40px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Lexend', Verdana, sans-serif;
+    font-weight: 200;
+    letter-spacing: -0.5px;
+    line-height: 1.22;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  header.hero {
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+  }
+
+  .eyebrow {
+    font-family: 'Inter', Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--emerald);
+  }
+  :root[data-theme="dark"] .eyebrow,
+  :root:not([data-theme="light"]) .eyebrow { color: var(--mint); }
+  @media (prefers-color-scheme: light) { .eyebrow { color: var(--emerald); } }
+
+  h1 { font-size: clamp(28px, 4.4vw, 40px); margin-top: 6px; }
+
+  .dek {
+    font-size: 16px;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin-top: 12px;
+  }
+
+  .intro-card {
+    margin-top: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--emerald);
+    border-radius: 10px;
+    padding: 16px 18px;
+    width: 100%;
+  }
+  .intro-card + .intro-card { margin-top: 12px; }
+  .intro-card .label {
+    display: block;
+    font-family: 'Inter', Helvetica, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--emerald);
+    margin-bottom: 7px;
+  }
+  :root:not([data-theme="light"]) .intro-card .label,
+  :root[data-theme="dark"] .intro-card .label { color: var(--mint); }
+  .intro-card p {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink);
+    margin: 0;
+  }
+  .intro-card.method-card { border-left-color: var(--gravity); }
+
+  .anon-note {
+    font-size: 12px;
+    font-style: italic;
+    color: var(--ink-soft);
+    margin-top: 14px;
+  }
+
+  /* legend */
+  section.background { margin: 4px 0 34px; }
+  section.background h2 { font-size: 20px; margin-bottom: 10px; }
+  .bg-intro { font-size: 14px; color: var(--ink-soft); max-width: 68ch; margin-bottom: 20px; }
+  .pipeline-scroll { overflow-x: auto; }
+  .pipeline-fig { margin: 0; color: var(--ink); }
+  .pipeline-fig svg { display: block; width: 100%; min-width: 820px; height: auto; }
+  .pipeline-caption { font-size: 12px; font-style: italic; color: var(--ink-soft); margin-top: 10px; }
+  .pipeline-key { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin-top: 8px; }
+  .pipeline-key span { display: inline-flex; align-items: center; gap: 6px; }
+  .pipeline-key i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+  .pipeline-key i.examined { background: var(--emerald); }
+  .pipeline-key i.rest { background: none; border: 1.3px solid var(--ink-soft); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin: 6px 0 30px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .legend span.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    flex: none;
+    display: inline-block;
+  }
+  .swatch.fact { background: var(--emerald); }
+  .swatch.assum {
+    background: transparent;
+    border: 1.5px dashed var(--assum-border);
+  }
+  .swatch.conv {
+    background-image: repeating-linear-gradient(45deg, var(--conv-border) 0, var(--conv-border) 1.5px, transparent 1.5px, transparent 6px);
+    border: 1px solid var(--conv-border);
+  }
+
+  section.tier { margin-top: 6px; }
+
+  .tier-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .tier-head .swatch { transform: translateY(-2px); }
+  .tier-head h2 { font-size: 22px; }
+  .tier-sub { font-size: 13px; color: var(--ink-soft); margin-left: auto; text-align: right; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
+
+  /* Facts */
+  .fact-card {
+    background: var(--emerald);
+    color: var(--fact-fg);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .fact-card h3 { font-size: 15.5px; font-weight: 400; font-family: 'Inter', Helvetica, sans-serif; letter-spacing: 0; line-height: 1.35; }
+  .fact-card .who { font-size: 12.5px; opacity: 0.82; margin-top: 4px; }
+  .fact-card details { margin-top: 10px; }
+  .fact-card summary {
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 500;
+    opacity: 0.9;
+    list-style: none;
+  }
+  .fact-card summary::-webkit-details-marker { display: none; }
+  .fact-card summary::before { content: "+ "; }
+  .fact-card details[open] summary::before { content: "– "; }
+  .fact-card .evidence {
+    font-size: 13px;
+    line-height: 1.55;
+    opacity: 0.92;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(236,237,229,0.25);
+  }
+
+  /* Assumptions / Conventions */
+  .soft-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .soft-cols { grid-template-columns: 1fr; } }
+
+  .soft-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .soft-card.assum { border: 1.5px dashed var(--assum-border); }
+  .soft-card.conv {
+    border: 1px solid var(--conv-border);
+    background-image: repeating-linear-gradient(45deg, var(--conv-pattern) 0, var(--conv-pattern) 1px, transparent 1px, transparent 9px);
+  }
+  .soft-card h3 { font-size: 14.5px; font-weight: 500; font-family: 'Inter', Helvetica, sans-serif; letter-spacing: 0; line-height: 1.35; color: var(--ink); margin-bottom: 4px; }
+  .soft-card .believe { font-size: 12.5px; color: var(--ink-soft); }
+  .soft-card details { margin-top: 8px; }
+  .soft-card summary {
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    list-style: none;
+  }
+  .soft-card.assum summary { color: var(--assum-fg); }
+  .soft-card.conv summary { color: var(--conv-fg); }
+  .soft-card summary::-webkit-details-marker { display: none; }
+  .soft-card summary::before { content: "+ why it doesn't fully hold "; }
+  .soft-card details[open] summary::before { content: "– why it doesn't fully hold "; }
+  .soft-card .evidence { font-size: 12.5px; line-height: 1.55; color: var(--ink-soft); margin-top: 6px; }
+  .soft-card .evidence ul { margin: 0; padding-left: 16px; }
+  .soft-card .evidence li { margin-bottom: 4px; }
+
+  .soft-group-head { margin-bottom: 10px; }
+  .soft-group-head h2 { font-size: 18px; display: flex; align-items: center; gap: 8px; }
+  .soft-group-head p { font-size: 12.5px; color: var(--ink-soft); margin-top: 3px; }
+
+  .soft-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 700px) { .soft-groups { grid-template-columns: 1fr; } }
+  .soft-groups .soft-cols { grid-template-columns: 1fr; }
+
+  /* connectors */
+  .connector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0;
+    color: var(--ink-soft);
+  }
+  .connector svg { flex: none; }
+  .connector p { font-size: 12.5px; font-style: italic; margin: 0; }
+  .connector::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* conclusion */
+  .conclusion {
+    background: var(--bedrock);
+    color: var(--canvas);
+    border-radius: 14px;
+    padding: 24px 26px;
+  }
+  .conclusion h2 { font-size: 20px; color: var(--canvas); margin-bottom: 12px; }
+  .conclusion ul { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.6; }
+  .conclusion li { margin-bottom: 8px; }
+  .conclusion li:last-child { margin-bottom: 0; }
+
+  /* recommendations */
+  .rec-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 760px) { .rec-grid { grid-template-columns: 1fr; } }
+
+  .rec-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .rec-pill {
+    align-self: flex-start;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+  .rec-pill.build { background: var(--emerald); color: var(--canvas); }
+  .rec-pill.hold { background: var(--surface-2); color: var(--ink); }
+  .rec-card h3 { font-size: 15px; font-weight: 500; font-family: 'Inter', Helvetica, sans-serif; letter-spacing: 0; line-height: 1.35; }
+  .rec-card p { font-size: 13px; color: var(--ink-soft); margin: 0; }
+  .rec-card .ticket {
+    margin-top: auto;
+    font-size: 11.5px;
+    color: var(--assum-fg);
+    font-weight: 500;
+  }
+
+  .revisit {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+  .revisit b { color: var(--ink); font-weight: 500; }
+
+  footer {
+    margin-top: 36px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  footer a { color: var(--emerald); }
+  :root:not([data-theme="light"]) footer a,
+  :root[data-theme="dark"] footer a { color: var(--mint); }
+</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Lexend:wght@200;300&display=swap" rel="stylesheet">
+
+<div class="page">
+
+  <header class="hero">
+    <div class="eyebrow">Codat &middot; Product Case Study, 2026</div>
+    <h1>Reasoning from the ground up</h1>
+    <p class="dek">A first-principles case study on why Codat's lending categorization accuracy was under strain.</p>
+
+    <div class="intro-card">
+      <span class="label">The problem</span>
+      <p>When the data science team that had originally built Codat's categorization models left the business, institutional knowledge of how those models actually worked left with them. No one had a reliable view of what the system cost to run or how well it was performing &mdash; a gap that made the underlying issues difficult to diagnose, viable improvements nearly impossible to identify with confidence, and the value of any fix hard to quantify.</p>
+    </div>
+
+    <div class="intro-card method-card">
+      <span class="label">Method</span>
+      <p>Every claim was tested by how it was earned. Facts are supported by direct evidence. Assumptions are believed but unverified. Conventions are habits carried from precedent rather than evidence. Only what survived scrutiny against the facts was allowed to inform the recommendation.</p>
+    </div>
+
+    <p class="anon-note">Client and individual names have been anonymized to protect confidentiality; the underlying findings are unchanged.</p>
+  </header>
+
+  <section class="background">
+    <h2>Where this sits in the pipeline</h2>
+    <p class="bg-intro">Categorization isn't a standalone feature &mdash; it's shared infrastructure. Raw accounting and banking data is standardized, run through the two models this case study examines, then consumed by every credit and reporting surface built on top. That shared position is exactly why the accuracy question was worth investigating formally: a flaw here doesn't stay contained, it propagates downstream.</p>
+    <div class="pipeline-scroll">
+      <figure class="pipeline-fig">
+        <svg viewBox="0 0 1370 400" role="img" aria-label="Pipeline diagram: accounting and banking integrations feed a standardized data model and a data-integrity reconciliation check; the standardized data is categorized by two multi-stage models, BTC and CoA-Cat; their output, plus the reconciliation check, is merged by an orchestration and rules layer; the combined result is written to a shared enhancement layer with three internal stores, which in turn feeds four downstream products: Credit Model, Enhanced Financials, Categorized Bank Statements, and other BTC-derived enrichments.">
+          <defs>
+            <marker id="pf-arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 Z" fill="currentColor"/>
+            </marker>
+          </defs>
+
+          <!-- connectors -->
+          <g fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.7">
+            <path d="M180,57 L216,90" marker-end="url(#pf-arrow)"/>
+            <path d="M180,132 L216,98" marker-end="url(#pf-arrow)"/>
+            <path d="M300,122 L300,171" marker-end="url(#pf-arrow)"/>
+            <path d="M380,94 L416,63" marker-end="url(#pf-arrow)"/>
+            <path d="M380,94 L416,311" marker-end="url(#pf-arrow)"/>
+            <path d="M640,60 L676,168" marker-end="url(#pf-arrow)"/>
+            <path d="M640,314 L676,212" marker-end="url(#pf-arrow)"/>
+            <path d="M860,187 L896,168" marker-end="url(#pf-arrow)"/>
+            <path d="M1100,165 L1136,53" marker-end="url(#pf-arrow)"/>
+            <path d="M1100,165 L1136,134" marker-end="url(#pf-arrow)"/>
+            <path d="M1100,165 L1136,207" marker-end="url(#pf-arrow)"/>
+            <path d="M1100,165 L1136,292" marker-end="url(#pf-arrow)"/>
+          </g>
+          <path d="M380,200 L676,189" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="3 4" opacity="0.7" marker-end="url(#pf-arrow)"/>
+
+          <!-- data sources -->
+          <rect x="20" y="30" width="160" height="55" rx="10" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="100" y="52" text-anchor="middle" font-size="12.5" fill="currentColor">Accounting</text>
+          <text x="100" y="67" text-anchor="middle" font-size="12.5" fill="currentColor">integrations</text>
+
+          <rect x="20" y="105" width="160" height="55" rx="10" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="100" y="127" text-anchor="middle" font-size="12.5" fill="currentColor">Banking</text>
+          <text x="100" y="142" text-anchor="middle" font-size="12.5" fill="currentColor">integrations</text>
+
+          <!-- standardized data + integrity check -->
+          <rect x="220" y="67" width="160" height="55" rx="10" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="300" y="89" text-anchor="middle" font-size="12.5" fill="currentColor">Standardized</text>
+          <text x="300" y="104" text-anchor="middle" font-size="12.5" fill="currentColor">data model</text>
+
+          <rect x="220" y="175" width="160" height="50" rx="10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.85"/>
+          <text x="300" y="196" text-anchor="middle" font-size="11.5" fill="currentColor">Data integrity</text>
+          <text x="300" y="211" text-anchor="middle" font-size="11.5" fill="currentColor">reconciliation</text>
+
+          <!-- BTC (examined) -->
+          <rect x="420" y="8" width="220" height="105" rx="10" style="fill:var(--emerald)"/>
+          <text x="530" y="32" text-anchor="middle" font-size="12.5" style="fill:var(--canvas)">Bank transaction</text>
+          <text x="530" y="48" text-anchor="middle" font-size="12.5" style="fill:var(--canvas)">categorization (BTC)</text>
+          <text x="530" y="70" text-anchor="middle" font-size="11" style="fill:var(--canvas)" opacity="0.9">5 cascading classifiers</text>
+          <text x="530" y="85" text-anchor="middle" font-size="11" style="fill:var(--canvas)" opacity="0.9">confidence-gated, 2 sources</text>
+
+          <!-- CoA-Cat (examined) -->
+          <rect x="420" y="262" width="220" height="105" rx="10" style="fill:var(--emerald)"/>
+          <text x="530" y="286" text-anchor="middle" font-size="12.5" style="fill:var(--canvas)">Chart of accounts</text>
+          <text x="530" y="302" text-anchor="middle" font-size="12.5" style="fill:var(--canvas)">categorization (CoA-Cat)</text>
+          <text x="530" y="324" text-anchor="middle" font-size="11" style="fill:var(--canvas)" opacity="0.9">word-embedding features</text>
+          <text x="530" y="339" text-anchor="middle" font-size="11" style="fill:var(--canvas)" opacity="0.9">5-level category prediction</text>
+
+          <!-- orchestration -->
+          <rect x="680" y="140" width="180" height="95" rx="10" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="770" y="162" text-anchor="middle" font-size="12.5" fill="currentColor">Orchestration &amp;</text>
+          <text x="770" y="178" text-anchor="middle" font-size="12.5" fill="currentColor">combined output</text>
+          <text x="770" y="198" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.75">merges model + rules</text>
+          <text x="770" y="213" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.75">+ reference matching</text>
+
+          <!-- shared enhancement layer (3 internal stores) -->
+          <rect x="900" y="30" width="200" height="270" rx="12" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.55"/>
+          <text x="1000" y="52" text-anchor="middle" font-size="12.5" fill="currentColor" opacity="0.85">Shared enhancement layer</text>
+
+          <rect x="915" y="70" width="170" height="50" rx="8" fill="none" stroke="currentColor" stroke-width="1.3"/>
+          <text x="1000" y="91" text-anchor="middle" font-size="11" fill="currentColor">Predictions +</text>
+          <text x="1000" y="106" text-anchor="middle" font-size="11" fill="currentColor">confidence store</text>
+
+          <rect x="915" y="150" width="170" height="50" rx="8" fill="none" stroke="currentColor" stroke-width="1.3"/>
+          <text x="1000" y="180" text-anchor="middle" font-size="11" fill="currentColor">Enrichment events</text>
+
+          <rect x="915" y="230" width="170" height="50" rx="8" fill="none" stroke="currentColor" stroke-width="1.3"/>
+          <text x="1000" y="260" text-anchor="middle" font-size="11" fill="currentColor">Banking data store</text>
+
+          <!-- downstream products -->
+          <rect x="1140" y="15" width="210" height="70" rx="10" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="1245" y="38" text-anchor="middle" font-size="13" fill="currentColor">Credit Model</text>
+          <text x="1245" y="56" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.75">tagging &#8594; scorecard &#8594;</text>
+          <text x="1245" y="70" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.75">Credit Score</text>
+
+          <rect x="1140" y="105" width="210" height="55" rx="10" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="1245" y="127" text-anchor="middle" font-size="12.5" fill="currentColor">Enhanced</text>
+          <text x="1245" y="142" text-anchor="middle" font-size="12.5" fill="currentColor">Financials</text>
+
+          <rect x="1140" y="180" width="210" height="60" rx="10" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="1245" y="203" text-anchor="middle" font-size="12.5" fill="currentColor">Categorized Bank</text>
+          <text x="1245" y="218" text-anchor="middle" font-size="12.5" fill="currentColor">Statements</text>
+
+          <rect x="1140" y="260" width="210" height="70" rx="10" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="1245" y="280" text-anchor="middle" font-size="12.5" fill="currentColor">Other BTC-derived</text>
+          <text x="1245" y="295" text-anchor="middle" font-size="12.5" fill="currentColor">enrichments</text>
+          <text x="1245" y="311" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.75">payment &amp; counterparty ID, loans</text>
+        </svg>
+        <figcaption class="pipeline-caption">Simplified from the underlying architecture; exact tooling and field-level detail omitted. Even at this level, the two models this case study examines sit inside a longer chain &mdash; two upstream data feeds, a separate integrity check, an orchestration layer that merges model output with rules, a three-part shared data store, and four downstream products that all inherit whatever those two models get wrong.</figcaption>
+        <div class="pipeline-key">
+          <span><i class="examined"></i> Examined in this case study</span>
+          <span><i class="rest"></i> Rest of the pipeline</span>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <div class="legend">
+    <span class="chip"><span class="swatch fact"></span> Fact &mdash; evidence-backed</span>
+    <span class="chip"><span class="swatch assum"></span> Assumption &mdash; believed, not verified</span>
+    <span class="chip"><span class="swatch conv"></span> Convention &mdash; habit or precedent, not evidence</span>
+  </div>
+
+  <section class="tier" id="facts">
+    <div class="tier-head">
+      <span class="swatch fact"></span>
+      <h2>The facts</h2>
+      <span class="tier-sub">6 evidence-backed findings</span>
+    </div>
+    <div class="grid">
+
+      <div class="fact-card">
+        <h3>Lenders reported that bank transaction categorization (BTC) accuracy fell short</h3>
+        <div class="who">Fintech Lender A &middot; Fintech Lender B &middot; Fintech Lender C &middot; Fintech Lender D</div>
+        <details>
+          <summary>evidence</summary>
+          <div class="evidence">Lender A found the output underwhelming, with little usable context on checks and transfers, and began evaluating alternative providers. Lender B built its own bank-transaction model in-house, citing higher accuracy than any third-party provider it had tested. Lender C ran a successful proof of concept with a specialist competitor. Lender D, a strategically important renewal, disclosed it was building an internal alternative &mdash; making an accuracy improvement time-critical to retaining the account.</div>
+        </details>
+      </div>
+
+      <div class="fact-card">
+        <h3>Lenders reported that chart-of-accounts categorization (CoA-Cat) wasn't good enough</h3>
+        <div class="who">Fintech Lender E &middot; Fintech Lenders F, G, H &middot; Fintech Lender C</div>
+        <details>
+          <summary>evidence</summary>
+          <div class="evidence">Lender E: "the categorizations are too granular and are often inaccurate." Lenders F, G and H each maintained entirely separate tagging workflows in spreadsheets, cross-referenced manually against the platform's output. Lender C built its own fallback because a required expense split (operating vs. non-operating) wasn't modelled, which affected the accuracy of its downstream reporting.</div>
+        </details>
+      </div>
+
+      <div class="fact-card">
+        <h3>Internal confidence in the ML model's own benchmarks was low</h3>
+        <div class="who">No drift monitoring &middot; no dedicated DS/MLOps resourcing &middot; original team no longer in place</div>
+        <details>
+          <summary>evidence</summary>
+          <div class="evidence">In one review of a recent training run, Level 1 scores looked implausibly high (~99.9% precision/recall), as did the combined Level 3&ndash;5 score (~95%). The data science team flagged this as a warning sign rather than a result to celebrate &mdash; scores that clean usually indicate a flawed test set, not a strong model.</div>
+        </details>
+      </div>
+
+      <div class="fact-card">
+        <h3>Recategorization wasn't built around how clients actually worked</h3>
+        <div class="who">Only 54 of 86 clients recategorized anything in 2025</div>
+        <details>
+          <summary>evidence</summary>
+          <div class="evidence">Lender J chose a competitor partly for its stronger recategorization flow. Large Bank A couldn't use the workflow at all, since it recategorizes only after underwriting is complete. Confirmation rates were close to zero even among clients who did recategorize (Large Bank C: 0.42%, Neobank A: 0.12%). Lender I's team preferred working directly in a spreadsheet over the in-product workflow.</div>
+        </details>
+      </div>
+
+      <div class="fact-card">
+        <h3>Categorization is a genuinely difficult problem to solve well</h3>
+        <div class="who">BTC is structurally harder than CoA-Cat</div>
+        <details>
+          <summary>evidence</summary>
+          <div class="evidence">Bank transactions carry thin, inconsistent context and constantly shifting merchant names &mdash; a moving target. A chart of accounts is comparatively stable, set up once by the business. Even specialist competitors focused solely on bank-transaction data hadn't fully solved it.</div>
+        </details>
+      </div>
+
+      <div class="fact-card">
+        <h3>Any material taxonomy change would disrupt existing clients</h3>
+        <div class="who">Several clients, including Lender D and Large Bank B, automate on today's taxonomy</div>
+        <details>
+          <summary>evidence</summary>
+          <div class="evidence">Clients had built automated workflows on top of the current taxonomy; changing it would mean months of rework on their side. A migration project would need to clear a high bar of value to justify that disruption.</div>
+        </details>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="connector">
+    <svg width="20" height="34" viewBox="0 0 20 34" role="img" aria-label="down arrow">
+      <line x1="10" y1="0" x2="10" y2="24" stroke="currentColor" stroke-width="1.5"/>
+      <polygon points="10,32 4,20 16,20" fill="currentColor"/>
+    </svg>
+    <p>every claim below is tested against these six facts</p>
+  </div>
+
+  <section class="tier" id="soft">
+    <div class="soft-groups">
+      <div>
+        <div class="soft-group-head">
+          <h2><span class="swatch assum"></span> Assumptions</h2>
+          <p>believed, not verified</p>
+        </div>
+        <div class="soft-cols">
+
+          <div class="soft-card assum">
+            <h3>Improving accuracy is the highest-leverage fix for revenue</h3>
+            <div class="believe">The internal go-to-market view, cited in several lost sales opportunities</div>
+            <details>
+              <summary></summary>
+              <div class="evidence"><ul>
+                <li>Lender D and Lender B had already built their own categorization &mdash; would improved accuracy bring them back?</li>
+                <li>Lender E's own workaround (reprocessing exports with an LLM) might not disappear even with higher accuracy.</li>
+              </ul></div>
+            </details>
+          </div>
+
+          <div class="soft-card assum">
+            <h3>Clients mainly want higher accuracy on the existing taxonomy</h3>
+            <div class="believe">Clients consistently said the output "wasn't good enough"</div>
+            <details>
+              <summary></summary>
+              <div class="evidence"><ul>
+                <li>The evidence pointed to taxonomy gaps (Lender C's missing expense subcategories) and excessive granularity, not accuracy alone.</li>
+                <li>Lender K's own model used a single, flat level &mdash; the opposite of more granularity.</li>
+              </ul></div>
+            </details>
+          </div>
+
+          <div class="soft-card assum">
+            <h3>Accurate categorization is required for the broader BCE / MCP product strategy</h3>
+            <div class="believe">Based on an internal claim that granular (Level 3) accuracy sat at 66%</div>
+            <details>
+              <summary></summary>
+              <div class="evidence"><ul>
+                <li>Internal benchmarks weren't trusted enough to treat that figure as a reliable signal.</li>
+              </ul></div>
+            </details>
+          </div>
+
+        </div>
+      </div>
+
+      <div>
+        <div class="soft-group-head">
+          <h2><span class="swatch conv"></span> Conventions</h2>
+          <p>habit and precedent, not evidence</p>
+        </div>
+        <div class="soft-cols">
+
+          <div class="soft-card conv">
+            <h3>"Quick wins" would improve CoA-Cat accuracy</h3>
+            <div class="believe">An analysis identified four fixes, reporting 88.5% accuracy</div>
+            <details>
+              <summary></summary>
+              <div class="evidence"><ul>
+                <li>The fixes were validated on the same sample of accounts used to derive them &mdash; a circular test that said nothing about accuracy elsewhere.</li>
+              </ul></div>
+            </details>
+          </div>
+
+          <div class="soft-card conv">
+            <h3>Simplifying the taxonomy would help adoption</h3>
+            <div class="believe">The 250+ category, five-level taxonomy read as inherited from the original model design, not derived from client need</div>
+            <details>
+              <summary></summary>
+              <div class="evidence"><ul>
+                <li>Lender C's request was a taxonomy gap, not a case for simplification.</li>
+                <li>Client categorization needs varied enormously by industry.</li>
+              </ul></div>
+            </details>
+          </div>
+
+          <div class="soft-card conv">
+            <h3>Model trust should be rebuilt before doing anything else</h3>
+            <div class="believe">The intuitive first step</div>
+            <details>
+              <summary></summary>
+              <div class="evidence"><ul>
+                <li>Proposed previously and shelved &mdash; doing it properly would require significant time and resource that hadn't been allocated.</li>
+              </ul></div>
+            </details>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="connector">
+    <svg width="20" height="34" viewBox="0 0 20 34" role="img" aria-label="down arrow">
+      <line x1="10" y1="0" x2="10" y2="24" stroke="currentColor" stroke-width="1.5"/>
+      <polygon points="10,32 4,20 16,20" fill="currentColor"/>
+    </svg>
+    <p>what remained once belief and habit were set aside</p>
+  </div>
+
+  <section class="conclusion">
+    <h2>Where that left us</h2>
+    <ul>
+      <li>The available evidence didn't establish definitively <em>what</em> was wrong &mdash; much of the internal documentation reflected hypothesis rather than root cause.</li>
+      <li>There was no internal confidence in the ML model's benchmarks or accuracy.</li>
+      <li>Categorization needs varied enormously across lending clients, several of which had already built their own layer on top of the platform's output.</li>
+      <li>Larger banking clients had already standardized on established third-party taxonomies of their own.</li>
+    </ul>
+  </section>
+
+  <div class="connector">
+    <svg width="20" height="34" viewBox="0 0 20 34" role="img" aria-label="down arrow">
+      <line x1="10" y1="0" x2="10" y2="24" stroke="currentColor" stroke-width="1.5"/>
+      <polygon points="10,32 4,20 16,20" fill="currentColor"/>
+    </svg>
+    <p>therefore</p>
+  </div>
+
+  <section class="tier" id="recs">
+    <div class="tier-head">
+      <h2>Recommendations</h2>
+    </div>
+    <div class="rec-grid">
+
+      <div class="rec-card">
+        <span class="rec-pill build">Build</span>
+        <h3>Establish a shared view of model performance</h3>
+        <p>A documentation exercise, not new analysis: pull the existing accuracy figures for both models into one dashboard and reference document, each figure dated and sourced. Flag explicitly where figures are stale or missing, and separate genuine measured accuracy from confidence scores being used as a stand-in for it.</p>
+        <div class="ticket">Scope: existing figures only, no new modelling &middot; Target: end of Q3</div>
+      </div>
+
+      <div class="rec-card">
+        <span class="rec-pill hold">Decision</span>
+        <h3>Do not invest further in BTC</h3>
+        <p>Specialist competitors focused solely on this problem hadn't solved it either. This was not a space to win with a partial, side-of-desk effort.</p>
+      </div>
+
+      <div class="rec-card">
+        <span class="rec-pill hold">Decision</span>
+        <h3>Do not change the CoA-Cat taxonomy at this time</h3>
+        <p>No clear path to improvement existed that didn't require a client migration effort disproportionate to the expected value &mdash; including a move to a third-party standard taxonomy.</p>
+      </div>
+
+    </div>
+
+    <div class="revisit">
+      <b>Revisit if:</b> new client feedback pointed to specific improvements, or clearer patterns emerged as the product strategy evolved.
+    </div>
+  </section>
+
+  <footer>
+    <span>Hannah Mansour &middot; Senior Product Manager, Codat</span>
+    <span>Case study anonymized for confidentiality &middot; 2026</span>
+  </footer>
+
+</div>
+</body>
+</html>
