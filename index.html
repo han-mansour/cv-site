@@ -6,7 +6,7 @@
     --bg:#0B0E13; --surface:#141922; --surface-2:#1B222D; --panel:#12171F;
     --border:#28313E; --hair:#20272F;
     --ink:#EDF1F6; --muted:#98A4B6; --faint:#6A7686;
-    --accent:#7C83FD; --accent-2:#9BA1FF; --accent-soft:#171A33;
+    --accent:#00F4CF; --accent-2:#6FFCE3; --accent-soft:#0C2823;
     --cool:#5FC7C7; --cool-soft:#12252A;
     --green:#4FD08A; --green-soft:#122A1D;
     --gold:#E8B24A; --gold-soft:#241C0C;
@@ -93,17 +93,31 @@
   .sec-grid{margin-top:32px}
 
   /* ---------- profile panel ---------- */
-  .tldr{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:26px;box-shadow:var(--shadow)}
+  .tldr{
+    position:relative;overflow:hidden;
+    background:linear-gradient(180deg,var(--accent-soft) 0%,var(--panel) 220px),var(--panel);
+    border:1px solid color-mix(in srgb,var(--accent) 32%,var(--border));
+    border-radius:18px;padding:30px 32px;box-shadow:var(--shadow-lift);
+  }
+  .tldr::before{
+    content:"";position:absolute;inset:0 0 auto 0;height:3px;
+    background:linear-gradient(90deg,var(--accent),transparent 75%);
+  }
   .tldr p{color:var(--muted);margin-top:12px;max-width:70ch}
   .tldr p:first-of-type{margin-top:14px}
   .tldr strong{color:var(--ink);font-weight:600}
-  .tldr a{color:var(--cool);text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--cool) 45%,transparent);text-underline-offset:3px}
-  .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:22px;border-top:1px solid var(--hair)}
-  .fact{padding:14px 16px 0;border-left:1px solid var(--hair)}
-  .fact:first-child{border-left:0}
-  .fact dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
-  .fact dd{margin:6px 0 14px;color:var(--ink);font-size:13.5px}
-  @media (max-width:680px){.facts{grid-template-columns:1fr 1fr}.fact{border-left:0;border-top:1px solid var(--hair);padding-top:14px}.fact:first-child{border-top:0}}
+  .tldr a{color:var(--accent);text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--accent) 45%,transparent);text-underline-offset:3px}
+
+  /* ---------- off the clock pills (pitch box) ---------- */
+  .oclock-label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin-top:24px}
+  .oclock-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .oclock-pill{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;font-weight:500;
+    border-radius:999px;padding:8px 15px 8px 12px;border:1px solid transparent}
+  .oclock-pill svg{width:16px;height:16px;flex:none}
+  .oclock-pill.t-accent{background:var(--accent-soft);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 35%,transparent)}
+  .oclock-pill.t-cool{background:var(--cool-soft);color:var(--cool);border-color:color-mix(in srgb,var(--cool) 35%,transparent)}
+  .oclock-pill.t-gold{background:var(--gold-soft);color:var(--gold);border-color:color-mix(in srgb,var(--gold) 35%,transparent)}
+  .oclock-pill.t-green{background:var(--green-soft);color:var(--green);border-color:color-mix(in srgb,var(--green) 35%,transparent)}
 
   /* ---------- experience ---------- */
   .role{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;position:relative}
@@ -242,14 +256,15 @@
     <div class="sec-grid">
       <div class="tldr">
         <p><strong>Senior product specialist</strong> skilled in defining strategy and building products from 0&rarr;1, levelling up existing products, and fostering high-impact, cross-functional product squads that ship and drive business impact.</p>
-        <p>Experienced across complex B2B and B2C SaaS, APIs, digital marketplaces, generative AI and agentic workflow tools.</p>
-        <p>Product Lead at Trint, defined and built the first set of generative AI tools that streamline user workflows (<a href="https://trint.com/blog/trint-spotlight-bringing-generative-ai-to-trint" target="_blank" rel="noopener">blog article</a>) and launched new revenue channels generating $2M+ ARR in Year 1. Led the PM team, defined ways of working and shaped product and GTM strategy with business leads.</p>
-        <dl class="facts">
-          <div class="fact"><dt>Currently</dt><dd>Credit Intelligence, Codat</dd></div>
-          <div class="fact"><dt>Languages</dt><dd>English (native), Arabic</dd></div>
-          <div class="fact"><dt>Based</dt><dd>London, UK</dd></div>
-          <div class="fact"><dt>Interests</dt><dd>Boxing, tennis, cooking, travel, DJing</dd></div>
-        </dl>
+        <p>Experienced across complex B2B and B2C SaaS, APIs, digital marketplaces, generative AI and agentic workflow tools. Fluent in English and conversational in Arabic.</p>
+        <div class="oclock-label">Off the clock</div>
+        <div class="oclock-row">
+          <span class="oclock-pill t-accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="12" rx="5"/><path d="M7 8c-2 0-3.5 1.5-3.5 3.5S5 15 7 15"/><rect x="9" y="15" width="6" height="6" rx="1.5"/></svg>Boxing</span>
+          <span class="oclock-pill t-cool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="9" cy="8" rx="5.5" ry="6.5"/><path d="M5 4.5l8 7M13 4.5l-8 7" stroke-width="1"/><path d="M9 14.3V20"/><circle cx="19" cy="18" r="2.3"/></svg>Tennis</span>
+          <span class="oclock-pill t-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16v2.5A5.5 5.5 0 0 1 14.5 19h-5A5.5 5.5 0 0 1 4 13.5z"/><path d="M2 11h20"/><path d="M9 3.5c0 1-1.2 1-1.2 2S9 6.5 9 7.5M13.5 3.5c0 1-1.2 1-1.2 2s1.2 1 1.2 2" stroke-width="1.4"/></svg>Cooking</span>
+          <span class="oclock-pill t-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>Travelling</span>
+          <span class="oclock-pill t-accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="12" r="7"/><circle cx="10" cy="12" r="2"/><path d="M15.2 7.2l5.8-2M19.5 2.8l1.5 2.4"/></svg>DJing</span>
+        </div>
       </div>
     </div>
   </section>
